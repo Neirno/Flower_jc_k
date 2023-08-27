@@ -1,0 +1,239 @@
+package com.neirno.flower_jc_k.feature_flower.presentation.camera
+
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.MediaStore
+import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
+import com.google.common.util.concurrent.ListenableFuture
+import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.AddEditFlowerEvent
+import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.AddEditFlowerViewModel
+import com.neirno.flower_jc_k.feature_flower.presentation.camera.components.CameraControls
+import com.neirno.flower_jc_k.feature_flower.presentation.camera.components.CanvasPhoto
+import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
+import com.neirno.flower_jc_k.feature_flower.presentation.components.CustomTopAppBar
+import java.io.File
+
+@Composable
+fun CameraScreen(
+    viewModel: CameraViewModel = hiltViewModel(),
+    navController: NavController,
+) {
+    val context: Context = LocalContext.current
+    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+    val preview: Preview = remember { Preview.Builder().build() }
+    val cameraSelector = remember { CameraSelector.DEFAULT_BACK_CAMERA }
+    val imageCapture: ImageCapture = remember { ImageCapture.Builder().build() }
+
+    val viewState = viewModel.viewState.value
+
+    BackHandler() {
+        if (viewState.isInPreviewMode) {
+            viewModel.onEvent(CameraEvent.UpdatePreviewImageUri(null))
+            viewModel.onEvent(CameraEvent.SetIsInPreviewMode(false))
+        } else {
+            navController.popBackStack()
+        }
+    }
+
+    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri: Uri? = result.data?.data
+            if (uri != null) {
+                viewModel.onEvent(CameraEvent.UpdatePreviewImageUri(uri))
+                viewModel.onEvent(CameraEvent.SetIsInPreviewMode(true))
+            }
+        }
+    }
+
+    Scaffold (
+        bottomBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.2f)
+                    .background(Color.White), // фоновый цвет для лучшей видимости кнопок
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CameraControls(
+                    isInPreviewMode = viewState.isInPreviewMode,
+                    onCapture = {
+                        takePhoto(context, imageCapture) { uri ->
+                            viewModel.onEvent(CameraEvent.UpdatePreviewImageUri(uri))
+                            viewModel.onEvent(CameraEvent.SetIsInPreviewMode(true))
+                        }
+                    },
+                    onOpenGallery = {
+                        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                        startForResult.launch(intent)
+                    },
+                    onAccept = {
+                        Log.d("NavControllerDebug", "Before setting imageUri")
+                        navController.previousBackStackEntry?.savedStateHandle?.set("imageUri", viewState.previewImageUri)
+                        Log.d("NavControllerDebug", "After setting imageUri")
+                        navController.previousBackStackEntry?.savedStateHandle?.apply {
+                            set("imageUri", viewState.previewImageUri)
+                            val checkValue = get<Uri>("imageUri")
+                            Log.d("NavControllerDebug", "Value of imageUri: $checkValue")
+                        }
+
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+    ) { paddingValues: PaddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues),
+        ) {
+
+            if (viewState.isInPreviewMode && viewState.previewImageUri != null) {
+                Image(
+                    painter = rememberImagePainter(viewState.previewImageUri),
+                    contentDescription = "Preview",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                CustomTopAppBar(
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .background(Color.Transparent),
+                    leftButton = ButtonType.BACK,
+                    onLeftButtonClick = {
+                        viewModel.onEvent(CameraEvent.UpdatePreviewImageUri(null))
+                        viewModel.onEvent(CameraEvent.SetIsInPreviewMode(false))
+                    }
+                )
+            } else {
+
+                CameraView(viewModel, cameraProviderFuture, preview, imageCapture, cameraSelector)
+                CustomTopAppBar(
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .background(Color.Transparent),
+                    leftButton = ButtonType.CLOSE,
+                    onLeftButtonClick = {navController.popBackStack()},
+                    onRightButtonClick = {
+                        viewModel.onEvent(CameraEvent.SetFlashlightState)
+                    },
+                    rightButton = if (viewState.isFlashlightOn) ButtonType.FLASH_ON else ButtonType.FLASH_OFF
+                )
+                CanvasPhoto(Modifier)
+            }
+        }
+    }
+}
+
+
+private fun takePhoto(context: Context, imageCapture: ImageCapture, onPhotoTaken: (Uri) -> Unit) {
+    val fileName = "flower_image_${System.currentTimeMillis()}.jpg"
+    val outputDirectory = context.getExternalFilesDir(null)
+    val photoFile = File(outputDirectory, fileName)
+
+    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+    imageCapture.takePicture(
+        outputOptions,
+        ContextCompat.getMainExecutor(context),
+        object : ImageCapture.OnImageSavedCallback {
+            override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                val savedUri = Uri.fromFile(photoFile)
+                onPhotoTaken(savedUri)
+            }
+
+            override fun onError(exc: ImageCaptureException) {
+                Log.e("CameraScreen", "Photo capture failed: ${exc.message}", exc)
+            }
+        }
+    )
+}
+
+@Composable
+private fun CameraView(
+    viewModel: CameraViewModel,
+    cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,
+    preview: Preview,
+    imageCapture: ImageCapture,
+    cameraSelector: CameraSelector,
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = {
+            val previewView = PreviewView(context)
+            cameraProviderFuture.addListener({
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+                try {
+                    // Очищаем все предыдущие использования камеры перед повторным использованием
+                    cameraProvider.unbindAll()
+                    val camera = cameraProvider.bindToLifecycle(
+                        lifecycleOwner,
+                        cameraSelector,
+                        preview,
+                        imageCapture
+                    )
+                    viewModel.onEvent(CameraEvent.SetCamera(camera))
+                    preview.setSurfaceProvider(previewView.surfaceProvider)
+                } catch (exc: Exception) {
+                    Log.e("CameraView", "Use case binding failed", exc)
+                }
+            }, ContextCompat.getMainExecutor(context))
+            previewView
+        }
+    )
+}
+

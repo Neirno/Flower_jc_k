@@ -1,0 +1,106 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "8afcbe4434a2566b925f55bcb3aae391",
+    "entities": [
+      {
+        "tableName": "Flower",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `imageFilePath` TEXT, `wateringFrequency` INTEGER NOT NULL, `fertilizingFrequency` INTEGER NOT NULL, `sprayingFrequency` INTEGER NOT NULL, `nextWateringDate` INTEGER NOT NULL, `nextFertilizingDate` INTEGER NOT NULL, `nextSprayingDate` INTEGER NOT NULL, `wateringWorkerId` TEXT, `fertilizingWorkerId` TEXT, `sprayingWorkerId` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "imageFilePath",
+            "columnName": "imageFilePath",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wateringFrequency",
+            "columnName": "wateringFrequency",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fertilizingFrequency",
+            "columnName": "fertilizingFrequency",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sprayingFrequency",
+            "columnName": "sprayingFrequency",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nextWateringDate",
+            "columnName": "nextWateringDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nextFertilizingDate",
+            "columnName": "nextFertilizingDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nextSprayingDate",
+            "columnName": "nextSprayingDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wateringWorkerId",
+            "columnName": "wateringWorkerId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fertilizingWorkerId",
+            "columnName": "fertilizingWorkerId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sprayingWorkerId",
+            "columnName": "sprayingWorkerId",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8afcbe4434a2566b925f55bcb3aae391')"
+    ]
+  }
+}
