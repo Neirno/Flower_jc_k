@@ -40,7 +40,7 @@ import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
 fun FlowerOrderDropdown(
     flowerOrder: FlowerOrder = FlowerOrder.Water(OrderType.Descending),
     onOrderChange: (FlowerOrder) -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var buttonCoordinates by remember { mutableStateOf(IntOffset(0, 0)) }
