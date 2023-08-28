@@ -26,9 +26,9 @@ fun setAlarm(context: Context, flower: Flower, actionType: Int) {
     val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
     val nextAlarmDateTime = when (actionType) {
-        1 -> flower.nextWateringDateTime + TimeUnit.DAYS.toMillis(flower.wateringFrequency.toLong())
-        2 -> flower.nextFertilizingDateTime + TimeUnit.DAYS.toMillis(flower.fertilizingFrequency.toLong())
-        3 -> flower.nextSprayingDateTime + TimeUnit.DAYS.toMillis(flower.sprayingFrequency.toLong())
+        1 -> flower.nextWateringDateTime + TimeUnit.DAYS.toMillis(flower.wateringDays.toLong())
+        2 -> flower.nextFertilizingDateTime + TimeUnit.DAYS.toMillis(flower.fertilizingDays.toLong())
+        3 -> flower.nextSprayingDateTime + TimeUnit.DAYS.toMillis(flower.sprayingDays.toLong())
         else -> throw IllegalArgumentException("Invalid action type")
     }
 

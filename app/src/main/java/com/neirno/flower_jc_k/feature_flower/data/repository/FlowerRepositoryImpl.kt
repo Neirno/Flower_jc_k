@@ -32,30 +32,42 @@ class FlowerRepositoryImpl (
     override suspend fun deleteFlower(flower: Flower) {
         flowerDao.delete(flower)
     }
-
+    // TODO("Сделать реализацию update для другой модели.")
     override suspend fun updateWateringDate(flower: Flower) {
-        val nextWateringDateMillis = getNextActionTimeInMillis(flower.wateringFrequency, flower.wateringTime)
+        val nextWateringDateMillis = getNextActionTimeInMillis(
+            flower.wateringDays,
+            flower.wateringHours,
+            flower.wateringMinutes
+        )
         val updatedFlower = flower.copy(nextWateringDateTime = nextWateringDateMillis)
         flowerDao.update(updatedFlower)
     }
 
     override suspend fun updateFertilizingDate(flower: Flower) {
-        val nextFertilizingDateMillis = getNextActionTimeInMillis(flower.fertilizingFrequency, flower.fertilizingTime)
+        val nextFertilizingDateMillis = getNextActionTimeInMillis(
+            flower.fertilizingDays,
+            flower.fertilizingHours,
+            flower.fertilizingMinutes
+        )
         val updatedFlower = flower.copy(nextFertilizingDateTime = nextFertilizingDateMillis)
         flowerDao.update(updatedFlower)
     }
 
     override suspend fun updateSprayingDate(flower: Flower) {
-        val nextSprayingDateMillis = getNextActionTimeInMillis(flower.sprayingFrequency, flower.spayingTime)
+        val nextSprayingDateMillis = getNextActionTimeInMillis(
+            flower.sprayingDays,
+            flower.sprayingHours,
+            flower.sprayingMinutes
+        )
         val updatedFlower = flower.copy(nextSprayingDateTime = nextSprayingDateMillis)
         flowerDao.update(updatedFlower)
     }
 
-    private suspend fun getNextActionTimeInMillis(daysToAdd: Int, minutesToAdd: Int): Long {
+    private suspend fun getNextActionTimeInMillis(days: Int, hours: Int, minutes: Int): Long {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_MONTH, daysToAdd + 1)
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, minutesToAdd)
+        calendar.add(Calendar.DAY_OF_MONTH, days + 1)
+        calendar.set(Calendar.HOUR_OF_DAY, hours)
+        calendar.set(Calendar.MINUTE, minutes)
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
         return calendar.timeInMillis

@@ -1,8 +1,6 @@
 package com.neirno.flower_jc_k.feature_flower.presentation.flowers.components
 
-import android.net.Uri
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,16 +16,12 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.neirno.flower_jc_k.R
 import com.neirno.flower_jc_k.feature_flower.domain.model.Flower
-import kotlinx.coroutines.delay
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -61,15 +55,15 @@ fun FlowerItem(
 
     // Вычисляем количество дней до следующего полива
     val daysUntilNextFertilizing = TimeUnit.MILLISECONDS.toDays(flower.nextFertilizingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
-    val daysUntilNextSpraying = TimeUnit.MILLISECONDS.toDays(flower.nextSprayingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
+    //val daysUntilNextSpraying = TimeUnit.MILLISECONDS.toDays(flower.nextSprayingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
     //val daysUntilNextWatering = TimeUnit.MILLISECONDS.toDays(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)
     val daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis())).coerceAtLeast(
         0.toString()
     )
     val minutesUntilNextWatering = TimeUnit.MILLISECONDS.toMinutes(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)
 
-    val wateringProgress = if (flower.wateringFrequency != 0) {
-        minutesUntilNextWatering.toFloat() / (flower.wateringFrequency*24*60 + flower.wateringTime).toFloat()
+    val wateringProgress = if (flower.wateringDays != 0) {
+        minutesUntilNextWatering.toFloat() / (flower.wateringDays*24*60 + flower.wateringHours * 60 + flower.wateringMinutes).toFloat()
     } else {
         0f
     }

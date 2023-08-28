@@ -20,18 +20,18 @@ class GetFlowers(
                     when(flowerOrder) {
                         is FlowerOrder.Name -> flowers.sortedBy { it.name.lowercase() }
                         //is FlowerOrder.Date -> flowers.sortedBy { it.timestamp }
-                        is FlowerOrder.Water -> flowers.sortedBy { it.wateringFrequency }
-                        is FlowerOrder.Fertilize -> flowers.sortedBy { it.fertilizingFrequency }
-                        is FlowerOrder.Spraying -> flowers.sortedBy { it.sprayingFrequency }
+                        is FlowerOrder.Water -> flowers.sortedBy { it.wateringDays }
+                        is FlowerOrder.Fertilize -> flowers.sortedBy { it.fertilizingDays }
+                        is FlowerOrder.Spraying -> flowers.sortedBy { it.sprayingDays }
                     }
                 }
                 is OrderType.Descending -> {
                     when(flowerOrder) {
                         is FlowerOrder.Name -> flowers.sortedByDescending { it.name.lowercase() }
                         //is FlowerOrder.Date -> flowers.sortedByDescending { it.timestamp }
-                        is FlowerOrder.Water -> flowers.sortedByDescending { it.wateringFrequency }
-                        is FlowerOrder.Fertilize -> flowers.sortedByDescending { it.fertilizingFrequency }
-                        is FlowerOrder.Spraying -> flowers.sortedByDescending { it.sprayingFrequency }
+                        is FlowerOrder.Water -> flowers.sortedByDescending { it.wateringDays }
+                        is FlowerOrder.Fertilize -> flowers.sortedByDescending { it.fertilizingDays }
+                        is FlowerOrder.Spraying -> flowers.sortedByDescending { it.sprayingDays }
                     }
                 }
             }

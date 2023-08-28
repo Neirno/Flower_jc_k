@@ -1,11 +1,7 @@
 package com.neirno.flower_jc_k.feature_flower.presentation.flowers.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,20 +22,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
-import androidx.compose.ui.zIndex
 import com.neirno.flower_jc_k.R
 import com.neirno.flower_jc_k.feature_flower.domain.util.FlowerOrder
 import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
@@ -49,7 +40,7 @@ import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
 fun FlowerOrderDropdown(
     flowerOrder: FlowerOrder = FlowerOrder.Water(OrderType.Descending),
     onOrderChange: (FlowerOrder) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var buttonCoordinates by remember { mutableStateOf(IntOffset(0, 0)) }
@@ -73,7 +64,11 @@ fun FlowerOrderDropdown(
                     )
                 }
         ) {
-            Icon(painter = painterResource(id = R.drawable.ic_help), contentDescription = "Description")
+            Icon(
+                painter = painterResource(id = R.drawable.ic_help),
+                contentDescription = "Description",
+                tint = Color(0xFF079B6D)
+            )
         }
     }
 

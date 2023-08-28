@@ -49,7 +49,6 @@ import com.neirno.flower_jc_k.R
 //import com.neirno.flower_jc_k.MainPage
 import com.neirno.flower_jc_k.feature_flower.presentation.flowers.FlowersScreen
 import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.AddEditFlowerScreen
-import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.components.PhoneCallPermissionTextProvider
 import com.neirno.flower_jc_k.feature_flower.presentation.camera.CameraScreen
 import com.neirno.flower_jc_k.feature_flower.presentation.util.Screen
 import com.neirno.flower_jc_k.ui.theme.Flower_jc_kTheme
@@ -81,7 +80,6 @@ fun createNotification(context: Context) {
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -180,7 +178,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Surface(
-                    color = Color(0xFFffffff)/*MaterialTheme.colorScheme.background*/,
+                    color = Color(0xFFDBD2C0)/*MaterialTheme.colorScheme.background*/,
                 ) {
                     val navController = rememberNavController()
                     NavHost(

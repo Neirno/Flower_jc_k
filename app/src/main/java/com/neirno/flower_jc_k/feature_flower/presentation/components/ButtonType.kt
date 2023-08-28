@@ -1,6 +1,7 @@
 package com.neirno.flower_jc_k.feature_flower.presentation.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Check
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.neirno.flower_jc_k.R
 
@@ -22,7 +24,7 @@ enum class ButtonType(val image: ImageVector, val description: String) {
     SETTINGS(Icons.Default.Settings, "Settings"),
     WATER(Icons.Default.WaterDrop, "Water"),
     SPRAY(Icons.Default.Spa, "Spray"),
-    ADD(Icons.Default.Spa, "Add"),
+    ADD(Icons.Default.Add, "Add"),
     FERTILIZE(Icons.Default.Spa, "Fertilize"),
     DELETE(Icons.Default.Delete, "Delete"),
     ACCEPT(Icons.Default.Check, "Accept"),

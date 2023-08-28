@@ -54,11 +54,11 @@ fun FlowersScreen(
 ) {
     val viewState = viewModel.viewState.value
     val bottomMenuItems = listOf(
-        BottomMenuItem(ButtonType.ADD, ActiveOperation.ADD),
-        BottomMenuItem(ButtonType.SPRAY, ActiveOperation.SPRAY),
-        BottomMenuItem(ButtonType.WATER, ActiveOperation.WATER),
-        BottomMenuItem(ButtonType.FERTILIZE, ActiveOperation.FERTILIZE),
-        BottomMenuItem(ButtonType.DELETE, ActiveOperation.DELETE),
+        BottomMenuItem(ButtonType.ADD, ActiveOperation.ADD, Color(0xFF079B5D)),
+        BottomMenuItem(ButtonType.SPRAY, ActiveOperation.SPRAY, Color(0xFF079B5D)),
+        BottomMenuItem(ButtonType.WATER, ActiveOperation.WATER, Color.Blue),
+        BottomMenuItem(ButtonType.FERTILIZE, ActiveOperation.FERTILIZE, Color(0xFF079B5D)),
+        BottomMenuItem(ButtonType.DELETE, ActiveOperation.DELETE, Color(0xFF202420)),
     )
 
     BackHandler(viewState.activeOperation != ActiveOperation.NONE) {
@@ -66,13 +66,13 @@ fun FlowersScreen(
         viewModel.onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
     }
     Scaffold(
-        containerColor = Color(0xFFffffff),
+        containerColor = Color(0xFFDBD2C0),
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.25f)
-                    .background(color = Color(0xFFffffff)),
+                    .background(color = Color(0xFFDBD2C0)),
 
 
                 horizontalArrangement = Arrangement.Start,

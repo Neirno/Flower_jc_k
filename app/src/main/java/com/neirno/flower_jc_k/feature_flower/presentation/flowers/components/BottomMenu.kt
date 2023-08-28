@@ -60,6 +60,7 @@ import kotlin.random.Random
 data class BottomMenuItem(
     val buttonType: ButtonType,
     val operation: ActiveOperation,
+    val color: Color
 )
 @Composable
 fun BottomMenu(
@@ -86,7 +87,7 @@ fun BottomMenu(
                 Icon(
                     imageVector = if (isItemActive) ButtonType.ACCEPT.image else item.buttonType.image,
                     contentDescription = item.buttonType.description,
-                    tint = if (isItemActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                    tint = if (isItemActive) MaterialTheme.colorScheme.primary else item.color,
                     modifier = Modifier
                         .clickable (
                             interactionSource = remember { MutableInteractionSource() },
