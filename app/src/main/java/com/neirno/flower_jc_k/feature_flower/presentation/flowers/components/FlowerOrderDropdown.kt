@@ -19,8 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,7 +38,7 @@ import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
 fun FlowerOrderDropdown(
     flowerOrder: FlowerOrder = FlowerOrder.Water(OrderType.Descending),
     onOrderChange: (FlowerOrder) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var buttonCoordinates by remember { mutableStateOf(IntOffset(0, 0)) }
