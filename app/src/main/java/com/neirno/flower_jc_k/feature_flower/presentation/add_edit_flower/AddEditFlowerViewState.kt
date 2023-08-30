@@ -6,6 +6,7 @@ data class AddEditFlowerViewState(
     val flowerName: FlowerTextFieldState = FlowerTextFieldState(hint = "Enter name..."),
     val flowerDescription: FlowerTextFieldState = FlowerTextFieldState(hint = "Enter description..."),
     val flowerImageUri: Uri? = null,
+    val selectedActions: List<String> = emptyList(),
 
     val flowerTimeToWater: Time = Time(0, 0, 0),
     val flowerTimeToSpraying: Time = Time(0, 0, 0),

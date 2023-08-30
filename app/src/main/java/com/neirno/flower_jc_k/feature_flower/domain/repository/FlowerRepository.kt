@@ -7,7 +7,7 @@ interface FlowerRepository {
 
     fun getFlowers(): Flow<List<Flower>>
 
-    suspend fun getFlowerById(id: Int): Flower?
+    suspend fun getFlowerById(id: Long): Flower?
 
     suspend fun insertFlower(flower: Flower): Long
 

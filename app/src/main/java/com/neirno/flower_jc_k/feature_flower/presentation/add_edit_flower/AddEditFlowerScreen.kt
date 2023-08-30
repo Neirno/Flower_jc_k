@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
@@ -65,7 +66,7 @@ fun AddEditFlowerScreen(
         topBar = {
             CustomTopAppBar(
                 modifier = Modifier,
-                onLeftButtonClick = {navController.popBackStack()},
+                onLeftButtonClick = { navController.popBackStack() },
                 leftButton = ButtonType.CLOSE,
             )
         },
@@ -115,13 +116,13 @@ fun AddEditFlowerScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             var isDialogVisible by remember { mutableStateOf(false) }
-
+            var isTimerSliderDialogVisible by remember { mutableStateOf(false) }
             TimeSliderDialog(
-                isVisible = isDialogVisible,
-                onDismiss = {isDialogVisible = !isDialogVisible},
-                timer_d = 3,
-                timer_h = 12,
-                timer_m = 0,
+                isVisible = isTimerSliderDialogVisible,
+                onDismiss = {isTimerSliderDialogVisible = !isTimerSliderDialogVisible},
+                timer_d = viewState.flowerTimeToWater.days,
+                timer_h = viewState.flowerTimeToWater.hours,
+                timer_m = viewState.flowerTimeToWater.minutes,
                 onValueSelected = { hours, minutes, days ->
                     run {
                         viewModel.onEvent(AddEditFlowerEvent.ChangeTimeToWater(days, hours, minutes))
@@ -130,15 +131,41 @@ fun AddEditFlowerScreen(
             )
 
 
-            IconButton(onClick = {isDialogVisible = !isDialogVisible}) {
-                Icon(modifier = Modifier, contentDescription = "", imageVector = Icons.Default.Add)
-            }
 
-      /*      TimePicker(
-                selectedDay = viewState.flowerTimeToWater.days,
-                onDayChange = { day -> viewModel.onEvent(AddEditFlowerEvent.ChangeDaysToWater(day)) },
-                icon = painterResource(id = R.drawable.ic_flower_list)
-            )*/
+
+            Column () {
+                IconButton(onClick = {isDialogVisible = !isDialogVisible}) {
+                    Icon(modifier = Modifier, contentDescription = "", imageVector = Icons.Default.Add)
+                }
+
+                ActionSelectionDialog(
+                    showDialog = isDialogVisible,
+                    selectedActions = viewState.selectedActions,
+                    onCloseDialog = { isDialogVisible = false }
+                ) { selectedAction ->
+                    // Здесь отправим событие в ViewModel
+                    viewModel.onEvent(AddEditFlowerEvent.SelectAction(selectedAction))
+                }
+
+                if ("WATERING" in viewState.selectedActions) {
+                    Text(
+                        text = "${viewState.flowerTimeToWater.days}:" +
+                                "${viewState.flowerTimeToWater.hours}:" +
+                                "${viewState.flowerTimeToWater.minutes}",
+                        modifier = Modifier.clickable { isTimerSliderDialogVisible = !isTimerSliderDialogVisible }
+                    )
+                }
+
+                if ("FERTILIZING" in viewState.selectedActions) {
+                    Text(text = "ГотовоФ")
+                    // Показать информацию и поля для удобрения
+                }
+
+                if ("SPRAYING" in viewState.selectedActions) {
+                    Text(text = "ГотовоС")
+                    // Показать информацию и поля для опрыскивания
+                }
+            }
 
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -155,3 +182,47 @@ fun AddEditFlowerScreen(
     }
 }
 
+@Composable
+fun ActionSelectionDialog(
+    showDialog: Boolean,
+    selectedActions: List<String>,
+    onCloseDialog: () -> Unit,
+    onActionSelected: (String) -> Unit
+) {
+    if (showDialog) {
+        Dialog(onDismissRequest = onCloseDialog) {
+            // Содержимое диалога
+            Column {
+                Text(text = "Выберите действие")
+
+                Spacer(modifier = Modifier.height(16.dp))
+                if ("WATERING" !in selectedActions) {
+                    Button(onClick = {
+                        onActionSelected("WATERING")
+                        onCloseDialog()
+                    }) {
+                        Text("Добавить полив")
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                if ("FERTILIZING" !in selectedActions) {
+                    Button(onClick = {
+                        onActionSelected("FERTILIZING")
+                        onCloseDialog()
+                    }) {
+                        Text("Добавить удобрение")
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                if ("FERTILIZING" !in selectedActions) {
+                    Button(onClick = {
+                        onActionSelected("SPRAYING")
+                        onCloseDialog()
+                    }) {
+                        Text("Добавить опрыскивание")
+                    }
+                }
+            }
+        }
+    }
+}

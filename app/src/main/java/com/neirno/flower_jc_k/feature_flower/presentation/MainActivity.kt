@@ -201,7 +201,7 @@ class MainActivity : ComponentActivity() {
                                     name = "flowerId"
                                 ) {
                                     type = NavType.IntType
-                                    defaultValue = -1
+                                    defaultValue = -1L
                                 },
                             )
                         ) {

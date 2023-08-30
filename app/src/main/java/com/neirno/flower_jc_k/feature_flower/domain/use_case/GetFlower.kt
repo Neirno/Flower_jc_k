@@ -7,7 +7,7 @@ class GetFlower(
     private val repository: FlowerRepository
 ) {
 
-    suspend operator fun invoke(id: Int): Flower? {
+    suspend operator fun invoke(id: Long): Flower? {
         return repository.getFlowerById(id)
     }
 }

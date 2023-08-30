@@ -9,6 +9,8 @@ sealed class AddEditFlowerEvent {
     data class EnteredDescription(val value: String) : AddEditFlowerEvent()
     data class ChangeDescriptionFocus(val focusState: FocusState) : AddEditFlowerEvent()
     data class SetImage(val uri: Uri) : AddEditFlowerEvent()
+    data class SelectAction(val str: String) : AddEditFlowerEvent()
+    data class RemoveAction(val str: String) : AddEditFlowerEvent()
 
     data class ChangeTimeToWater(val days: Int, val hours: Int, val minutes: Int) : AddEditFlowerEvent()
     data class ChangeTimeToFertilize(val days: Int, val hours: Int, val minutes: Int) : AddEditFlowerEvent()

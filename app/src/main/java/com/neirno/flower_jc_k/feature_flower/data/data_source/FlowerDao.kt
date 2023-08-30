@@ -10,7 +10,7 @@ interface FlowerDao {
     fun getFlowers(): Flow<List<Flower>>
 
     @Query("SELECT * FROM flower WHERE id = :id")
-    suspend fun getFlowerById(id: Int): Flower?
+    suspend fun getFlowerById(id: kotlin.Long): Flower?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(flower: Flower): Long

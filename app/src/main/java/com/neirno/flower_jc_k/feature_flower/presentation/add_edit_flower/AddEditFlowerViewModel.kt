@@ -36,52 +36,74 @@ class AddEditFlowerViewModel @Inject constructor(
 
     private var currentFlowerId: Long? = null
 
-    init {
-        savedStateHandle.get<Int>("flowerId")?.let { flowerId ->
-            if(flowerId != -1) {
-                viewModelScope.launch {
-                    flowerUseCases.getFlower(flowerId)?.also { flower ->
-                        currentFlowerId = flower.id
-                        _viewState.value = _viewState.value.copy(
-                            flowerName = _viewState.value.flowerName.copy(
-                                text = flower.name,
-                                isHintVisible = false
-                            ),
-                            flowerDescription = _viewState.value.flowerDescription.copy(
-                                text = flower.description ?: "",
-                                isHintVisible = false
-                            ),
-                            flowerImageUri = Uri.parse("file:///" + (flower.imageFilePath ?: "")),
-                            flowerTimeToWater = Time(
-                                flower.wateringDays,
-                                flower.wateringHours,
-                                flower.wateringMinutes
-                            ),
-                            flowerTimeToSpraying = Time(
-                                flower.sprayingDays,
-                                flower.sprayingHours,
-                                flower.sprayingMinutes
-                            ),
-                            flowerTimeToFertilize = Time(
-                                flower.fertilizingDays,
-                                flower.fertilizingHours,
-                                flower.fertilizingMinutes
-                            )
+    val initialSelectedActions = mutableListOf<String>()
 
-                        )
+    init {
+        val flowerId: Long = when (val flowerIdObj = savedStateHandle.get<Any>("flowerId")) {
+            is Int -> flowerIdObj.toLong()
+            is Long -> flowerIdObj
+            else -> -1L // или другое действие для неверного типа
+        }
+        if(flowerId != -1L) {
+            viewModelScope.launch {
+                flowerUseCases.getFlower(flowerId)?.also { flower ->
+                    currentFlowerId = flower.id
+
+                    val initialSelectedActions = mutableListOf<String>()
+                    if (flower.wateringDays != 0) {
+                        initialSelectedActions.add("WATERING")
                     }
+                    if (flower.sprayingDays != 0) {
+                        initialSelectedActions.add("SPRAYING")
+                    }
+                    if (flower.fertilizingDays != 0) {
+                        initialSelectedActions.add("FERTILIZING")
+                    }
+
+                    _viewState.value = _viewState.value.copy(
+                        flowerName = _viewState.value.flowerName.copy(
+                            text = flower.name,
+                            isHintVisible = false
+                        ),
+                        flowerDescription = _viewState.value.flowerDescription.copy(
+                            text = flower.description ?: "",
+                            isHintVisible = false
+                        ),
+                        flowerImageUri = Uri.parse("file:///" + (flower.imageFilePath ?: "")),
+                        flowerTimeToWater = Time(
+                            flower.wateringDays,
+                            flower.wateringHours,
+                            flower.wateringMinutes
+                        ),
+                        flowerTimeToSpraying = Time(
+                            flower.sprayingDays,
+                            flower.sprayingHours,
+                            flower.sprayingMinutes
+                        ),
+                        flowerTimeToFertilize = Time(
+                            flower.fertilizingDays,
+                            flower.fertilizingHours,
+                            flower.fertilizingMinutes
+                        ),
+                        selectedActions = initialSelectedActions
+                    )
                 }
             }
         }
-      /*  savedStateHandle.get<Uri>("imageUri")?.let { imageUri ->
-            Log.d("ViewModelDebug", "Received imageUri: $imageUri")
-            _flowerImageUri.value = imageUri
-        } ?: Log.d("ViewModelDebug", "No imageUri found in savedStateHandle")*/
     }
-
 
     fun onEvent(event: AddEditFlowerEvent) {
         when(event) {
+            is AddEditFlowerEvent.SelectAction -> {
+                _viewState.value = _viewState.value.copy(
+                    selectedActions = _viewState.value.selectedActions + event.str
+                )
+            }
+            is AddEditFlowerEvent.RemoveAction -> {
+                _viewState.value = _viewState.value.copy(
+                    selectedActions = _viewState.value.selectedActions.filter { it != event.str }
+                )
+            }
             is AddEditFlowerEvent.EnteredName -> {
                 _viewState.value = _viewState.value.copy(
                     flowerName = _viewState.value.flowerName.copy(
@@ -144,36 +166,6 @@ class AddEditFlowerViewModel @Inject constructor(
                     )
                 )
             }
-          /*  is AddEditFlowerEvent.ChangeDaysToWater -> {
-                _viewState.value = _viewState.value.copy(
-                    flowerDaysToWater = event.days
-                )
-            }
-            is AddEditFlowerEvent.ChangeDaysToFertilize -> {
-                _viewState.value = _viewState.value.copy(
-                    flowerDaysToFertilize = event.days
-                )
-            }
-            is AddEditFlowerEvent.ChangeDaysToSpraying -> {
-                _viewState.value = _viewState.value.copy(
-                    flowerDaysToSpraying = event.days
-                )
-            }
-            is AddEditFlowerEvent.ChangeMinutesToWater -> {
-                _viewState.value = _viewState.value.copy(
-                    flowerMinutesToWater = event.hours * 60 + event.minutes
-                )
-            }
-            is AddEditFlowerEvent.ChangeMinutesToFertilize -> {
-                _viewState.value = _viewState.value.copy(
-                    flowerMinutesToFertilize = event.hours * 60 + event.minutes
-                )
-            }
-            is AddEditFlowerEvent.ChangeMinutesToSpraying -> {
-                _viewState.value = _viewState.value.copy(
-                    flowerMinutesToSpraying = event.hours * 60 + event.minutes
-                )
-            }*/
             // Продолжите с другими событиями для свойств
             is AddEditFlowerEvent.SaveFlower -> {
                 viewModelScope.launch {
@@ -199,13 +191,54 @@ class AddEditFlowerViewModel @Inject constructor(
                             sprayingMinutes = viewState.value.flowerTimeToSpraying.minutes
 
                         )
-
+                        val oldFlower = currentFlowerId?.let { flowerUseCases.getFlower(it) }
                         var newFlower = flowerUseCases.addFlower(flower)
 
-                        // Установите будильники и обновите цветок после успешного сохранения
-                        newFlower = setAlarmAndUpdateFlower(newFlower, WATERING)
-                        newFlower = setAlarmAndUpdateFlower(newFlower, FERTILIZING)
-                        setAlarmAndUpdateFlower(newFlower, SPRAYING)
+                        if (oldFlower != null) {
+                            if (newFlower.wateringDays != oldFlower.wateringDays ||
+                                newFlower.wateringHours != oldFlower.wateringHours ||
+                                newFlower.wateringMinutes != oldFlower.wateringMinutes
+                            ) {
+                                newFlower = setAlarmAndUpdateFlower(newFlower, WATERING)
+                            } else {
+                                newFlower = newFlower.copy(
+                                    nextWateringDateTime = oldFlower.nextWateringDateTime
+                                )
+                                newFlower = flowerUseCases.addFlower(newFlower)
+                                Log.d("WATERING NEW", newFlower.nextWateringDateTime.toString())
+                                Log.d("WATERING NEW", oldFlower.nextWateringDateTime.toString())
+                            }
+
+                            if (newFlower.fertilizingDays != oldFlower.fertilizingDays ||
+                                newFlower.fertilizingHours != oldFlower.fertilizingHours ||
+                                newFlower.fertilizingMinutes != oldFlower.fertilizingMinutes
+                            ) {
+                                newFlower = setAlarmAndUpdateFlower(newFlower, FERTILIZING)
+                            } else {
+                                newFlower = newFlower.copy(
+                                    nextFertilizingDateTime = oldFlower.nextFertilizingDateTime
+                                )
+                                newFlower = flowerUseCases.addFlower(newFlower)
+                            }
+
+                            if (newFlower.sprayingDays != oldFlower.sprayingDays ||
+                                newFlower.sprayingHours != oldFlower.sprayingHours ||
+                                newFlower.sprayingMinutes != oldFlower.sprayingMinutes
+                            ) {
+                                newFlower = setAlarmAndUpdateFlower(newFlower, SPRAYING)
+                            } else {
+                                newFlower = newFlower.copy(
+                                    nextSprayingDateTime = oldFlower.nextSprayingDateTime
+                                )
+                                newFlower = flowerUseCases.addFlower(newFlower)
+                            }
+                        } else {
+                            // Если это новый цветок, установим все таймеры
+                            newFlower = setAlarmAndUpdateFlower(newFlower, WATERING)
+                            newFlower = setAlarmAndUpdateFlower(newFlower, FERTILIZING)
+                            setAlarmAndUpdateFlower(newFlower, SPRAYING)
+                        }
+
 
                         _eventFlow.emit(UiEvent.SaveFlower)
                     } catch(e: InvalidFlowerException) {
@@ -227,9 +260,6 @@ class AddEditFlowerViewModel @Inject constructor(
 
     private suspend fun setAlarmAndUpdateFlower(flower: Flower, actionType: Int): Flower {
         // Установите будильник
-        setAlarm(context, flower, actionType)
-        if (checkAlarm(context, flower, actionType))
-            Log.i("CheckAlarm", "Work")
 
         // Вычислите следующую дату и время для действия
         val days = when (actionType) {
@@ -258,6 +288,10 @@ class AddEditFlowerViewModel @Inject constructor(
         // Получите обновленный объект Flower на основе actionType
         val updatedFlower = getUpdatedFlowerForAction(flower, actionType, nextDateTime)
 
+        setAlarm(context, flower, actionType)
+        if (checkAlarm(context, flower, actionType))
+            Log.i("CheckAlarm", "Work")
+
         // Сохраните обновленный объект Flower
         return flowerUseCases.addFlower(updatedFlower)
     }
@@ -265,16 +299,13 @@ class AddEditFlowerViewModel @Inject constructor(
 
     private fun calculateNextActionTime(days: Int, hours: Int, minutes: Int): Long {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_MONTH, days + 1)
+        calendar.add(Calendar.DAY_OF_MONTH, days)
         calendar.set(Calendar.HOUR_OF_DAY, hours)
         calendar.set(Calendar.MINUTE, minutes)
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
         return calendar.timeInMillis
     }
-
-
-
 
 
     private fun getUpdatedFlowerForAction(flower: Flower, actionType: Int, nextDateTime: Long): Flower {
@@ -286,17 +317,31 @@ class AddEditFlowerViewModel @Inject constructor(
         }
     }
 
-    private fun saveImageToInternalStorage(uri: Uri): String {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val filename = "flower_image_${System.currentTimeMillis()}.jpg"
-        val outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE)
+    /**
+     * Сохраняет изображение во внутреннем хранилище приложения и возвращает путь к сохраненному файлу.
+     *
+     * @param uri URI изображения, которое нужно сохранить.
+     * @return Путь к сохраненному файлу или null в случае ошибки.
+     */
+    private fun saveImageToInternalStorage(uri: Uri): String? {
+        return try {
+            val filename = "flower_image_${System.currentTimeMillis()}.jpg"
+            val destinationFilePath = "${context.filesDir}/$filename"
 
-        inputStream?.copyTo(outputStream)
-        inputStream?.close()
-        outputStream?.close()
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                context.openFileOutput(filename, Context.MODE_PRIVATE).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
 
-        return "${context.filesDir}/$filename"
+            destinationFilePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
+
+
 
     companion object {
         const val WATERING = 1

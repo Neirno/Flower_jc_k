@@ -17,7 +17,7 @@ class FlowerRepositoryImpl (
         return flowerDao.getFlowers()
     }
 
-    override suspend fun getFlowerById(id: Int): Flower? {
+    override suspend fun getFlowerById(id: Long): Flower? {
         return flowerDao.getFlowerById(id)
     }
 
@@ -65,7 +65,7 @@ class FlowerRepositoryImpl (
 
     private suspend fun getNextActionTimeInMillis(days: Int, hours: Int, minutes: Int): Long {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_MONTH, days + 1)
+        calendar.add(Calendar.DAY_OF_MONTH, days)
         calendar.set(Calendar.HOUR_OF_DAY, hours)
         calendar.set(Calendar.MINUTE, minutes)
         calendar.set(Calendar.SECOND, 0)

@@ -28,21 +28,6 @@ class FlowerViewModel @Inject constructor(
     private val _viewState = mutableStateOf(FlowerViewState())
     val viewState: State<FlowerViewState> = _viewState
 
-    val visiblePermissionDialogQueue = mutableStateListOf<String>()
-
-    fun dismissDialog() {
-        visiblePermissionDialogQueue.removeFirst()
-    }
-
-    fun onPermissionResult(
-        permission: String,
-        isGranted: Boolean
-    ) {
-        if(!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
-            visiblePermissionDialogQueue.add(permission)
-        }
-    }
-
     private var getFlowersJob: Job? = null
 
     init {
@@ -93,17 +78,6 @@ class FlowerViewModel @Inject constructor(
                     }
                 }
             }
-       /*     is FlowersEvent.SelectFlower -> {
-                viewModelScope.launch {
-                    if (event.flower in currentSelectedItems) {
-                        currentSelectedItems.remove(event.flower)
-                    } else {
-                        currentSelectedItems.add(event.flower)
-                        _viewState.value.selectedFlowers + event.flower
-                    }
-                    _viewState.value = _viewState.value.copy(selectedFlowers = currentSelectedItems.toList())
-                }
-            }*/
             is FlowersEvent.SelectFlower -> {
                 viewModelScope.launch {
                     val newSelectedFlowers = if (event.flower in _viewState.value.selectedFlowers) {
@@ -121,24 +95,11 @@ class FlowerViewModel @Inject constructor(
                     _viewState.value = _viewState.value.copy(selectedFlowers = emptyList())
                 }
             }
-           /* is FlowersEvent.ClearRecentlyDeletedFlowers -> {
-                viewModelScope.launch {
-                    //recentlyChangedFlowers.clear()
-                }
-            }*/
             is FlowersEvent.SetActiveOperation -> {
                 viewModelScope.launch {
                     _viewState.value = _viewState.value.copy(activeOperation = event.operation)
                 }
             }
-        /*    is FlowersEvent.RestoreFlower -> {
-                viewModelScope.launch {
-                    while (recentlyChangedFlowers.isNotEmpty()) {
-                        val flowerToRestore = recentlyChangedFlowers.removeLast()
-                        flowerUseCases.addFlower(flowerToRestore)
-                    }
-                }
-            }*/
             is FlowersEvent.ToggleOrderSection -> {
                 _viewState.value = _viewState.value.copy(
                     orderState = _viewState.value.orderState.copy(
@@ -152,12 +113,6 @@ class FlowerViewModel @Inject constructor(
             is FlowersEvent.HideConfirmationDialog -> {
                 _viewState.value = _viewState.value.copy(showConfirmationDialog = false)
             }
-        /*    is FlowersEvent.ShowUndoDialog -> {
-                _viewState.value = _viewState.value.copy(showConfirm = true)
-            }
-            is FlowersEvent.HideUndoDialog -> {
-                _viewState.value = _viewState.value.copy(showConfirm = false)
-            }*/
         }
     }
 

@@ -28,6 +28,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun FlowerItem(
@@ -53,7 +56,7 @@ fun FlowerItem(
     }
 
 
-    // Вычисляем количество дней до следующего полива
+/*    // Вычисляем количество дней до следующего полива
     val daysUntilNextFertilizing = TimeUnit.MILLISECONDS.toDays(flower.nextFertilizingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
     //val daysUntilNextSpraying = TimeUnit.MILLISECONDS.toDays(flower.nextSprayingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
     //val daysUntilNextWatering = TimeUnit.MILLISECONDS.toDays(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)
@@ -63,11 +66,19 @@ fun FlowerItem(
     val minutesUntilNextWatering = TimeUnit.MILLISECONDS.toMinutes(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)
 
     val wateringProgress = if (flower.wateringDays != 0) {
-        minutesUntilNextWatering.toFloat() / (flower.wateringDays*24*60 + flower.wateringHours * 60 + flower.wateringMinutes).toFloat()
+        minutesUntilNextWatering.toFloat() + 60 * 24 / (flower.wateringDays*24*60 + flower.wateringHours * 60 + flower.wateringMinutes).toFloat()
     } else {
         0f
-    }
+    }*/
+    val daysUntilNextFertilizing = TimeUnit.MILLISECONDS.toDays(flower.nextFertilizingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
 
+    val daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis())).coerceAtLeast(
+        0.toString()
+    )
+    // Вычисляем разницу во времени до следующего действия
+    val maxTime = TimeUnit.DAYS.toMillis(flower.wateringDays.toLong())
+    val elapsedTime = (flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)
+    val wateringProgress = (maxTime - elapsedTime).toFloat() / maxTime.toFloat()
 
     Row(
         modifier = modifier
@@ -115,7 +126,7 @@ fun FlowerItem(
                 style = MaterialTheme.typography.labelSmall/*bodyMedium*/
             )
             LinearProgressIndicator(
-                progress = 1f - wateringProgress,
+                progress = /*1f - */wateringProgress,
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(1.dp, Color.Black)
