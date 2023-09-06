@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /*
@@ -77,7 +75,7 @@ fun CustomTopAppBar(
     onRightButtonClick: (() -> Unit)? = null,
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .height(56.dp),
 
@@ -90,9 +88,9 @@ fun CustomTopAppBar(
         ) {
             if (leftButton != null) {
                 Icon(
-                    imageVector = leftButton.image,
+                    painter = leftButton.imageProvider(),
                     contentDescription = leftButton.description,
-                    modifier = Modifier
+                    modifier = modifier
                         .padding(start = 16.dp)
                         .clickable(onClick = { onLeftButtonClick?.invoke() })
                 )
@@ -102,9 +100,9 @@ fun CustomTopAppBar(
             // Внутри вашего CustomTopBar
             if (rightButton != null) {
                 Icon(
-                    imageVector = rightButton.image,
+                    painter = rightButton.imageProvider(),
                     contentDescription = rightButton.description,
-                    modifier = Modifier
+                    modifier = modifier
                         .padding(end = 16.dp)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },

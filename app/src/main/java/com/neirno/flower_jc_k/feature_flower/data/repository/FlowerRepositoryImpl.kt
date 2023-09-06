@@ -40,7 +40,8 @@ class FlowerRepositoryImpl (
             flower.wateringMinutes
         )
         val updatedFlower = flower.copy(nextWateringDateTime = nextWateringDateMillis)
-        flowerDao.update(updatedFlower)
+        return flowerDao.update(updatedFlower)
+
     }
 
     override suspend fun updateFertilizingDate(flower: Flower) {

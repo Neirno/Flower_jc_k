@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Flower_jc_k</string>
+    <string name="app_name" translatable="false">Flower Helper</string>
+    <string name="enter_name">Enter name…</string>
+    <string name="enter_description">Enter description…</string>
 </resources>

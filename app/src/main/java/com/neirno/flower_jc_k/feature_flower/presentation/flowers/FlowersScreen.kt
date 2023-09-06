@@ -1,8 +1,8 @@
 package com.neirno.flower_jc_k.feature_flower.presentation.flowers
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
@@ -23,15 +20,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Bottom
-import androidx.compose.ui.Alignment.Companion.BottomCenter
-import androidx.compose.ui.Alignment.Companion.BottomEnd
-import androidx.compose.ui.Alignment.Companion.BottomStart
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -44,8 +34,8 @@ import com.neirno.flower_jc_k.feature_flower.presentation.flowers.components.Con
 import com.neirno.flower_jc_k.feature_flower.presentation.flowers.components.FlowerItem
 import com.neirno.flower_jc_k.feature_flower.presentation.util.Screen
 import com.neirno.flower_jc_k.feature_flower.presentation.flowers.components.BottomMenuItem
-import com.neirno.flower_jc_k.feature_flower.presentation.flowers.components.CustomDropdownMenu
 import com.neirno.flower_jc_k.feature_flower.presentation.flowers.components.FlowerOrderDropdown
+import com.neirno.flower_jc_k.ui.theme.CustomDark
 
 @Composable
 fun FlowersScreen(
@@ -54,11 +44,11 @@ fun FlowersScreen(
 ) {
     val viewState = viewModel.viewState.value
     val bottomMenuItems = listOf(
-        BottomMenuItem(ButtonType.ADD, ActiveOperation.ADD, Color(0xFF079B5D)),
-        BottomMenuItem(ButtonType.SPRAY, ActiveOperation.SPRAY, Color(0xFF079B5D)),
+        BottomMenuItem(ButtonType.ADD, ActiveOperation.ADD, CustomDark),
+        BottomMenuItem(ButtonType.SPRAYING, ActiveOperation.SPRAY, Color.White),
         BottomMenuItem(ButtonType.WATER, ActiveOperation.WATER, Color.Blue),
-        BottomMenuItem(ButtonType.FERTILIZE, ActiveOperation.FERTILIZE, Color(0xFF079B5D)),
-        BottomMenuItem(ButtonType.DELETE, ActiveOperation.DELETE, Color(0xFF202420)),
+        BottomMenuItem(ButtonType.FERTILIZE, ActiveOperation.FERTILIZE, Color.Yellow),
+        BottomMenuItem(ButtonType.DELETE, ActiveOperation.DELETE, CustomDark),
     )
 
     BackHandler(viewState.activeOperation != ActiveOperation.NONE) {
@@ -158,6 +148,7 @@ fun FlowersScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 items(viewState.orderState.flowers) { flowerItem ->
+                    Log.i(flowerItem.name, flowerItem.nextWateringDateTime.toString())
                     FlowerItem(
                         flower = flowerItem,
                         onItemSelected = {

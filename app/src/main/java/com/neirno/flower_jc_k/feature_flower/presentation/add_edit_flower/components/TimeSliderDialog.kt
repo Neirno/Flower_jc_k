@@ -31,7 +31,7 @@ fun TimeSliderDialog(
     isVisible: Boolean,
     title: String = "Выберите время",
     timer_d: Int, timer_h: Int, timer_m: Int,
-    onValueSelected: (hours: Int, minutes: Int, days: Int) -> Unit,
+    onValueSelected: (days: Int, hours: Int, minutes: Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     var _timer_h by remember { mutableIntStateOf(timer_h) }
@@ -73,7 +73,7 @@ fun TimeSliderDialog(
                                 minValue = 1,
                                 maxValue = 60,
                                 callBack = { _timer_d = it },
-                                defaultValue = _timer_d
+                                defaultValue = timer_d
                             )
                         }
 
@@ -92,7 +92,7 @@ fun TimeSliderDialog(
                                     text = "",
                                     maxValue = 23,
                                     callBack = { _timer_h = it },
-                                    defaultValue = _timer_h
+                                    defaultValue = timer_h
                                 )
                             }
                             Column (Modifier.align(Alignment.CenterVertically)){
@@ -115,7 +115,7 @@ fun TimeSliderDialog(
                                     text = "",
                                     maxValue = 59,
                                     callBack = { _timer_m = it },
-                                    defaultValue = _timer_m
+                                    defaultValue = timer_m
                                 )
                             }
                         }
@@ -131,7 +131,7 @@ fun TimeSliderDialog(
                             Text("Cancel")
                         }
                         TextButton(onClick = {
-                            onValueSelected(_timer_h, _timer_m, _timer_d)
+                            onValueSelected(_timer_d, _timer_h, _timer_m)
                             onDismiss()
                         }) {
                             Text("OK")

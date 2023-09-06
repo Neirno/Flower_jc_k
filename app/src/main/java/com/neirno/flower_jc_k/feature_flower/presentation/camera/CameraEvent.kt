@@ -7,6 +7,7 @@ sealed class CameraEvent {
     data class UpdatePreviewImageUri(val uri: Uri?) : CameraEvent()
     data class SetIsInPreviewMode(val isInPreview: Boolean) : CameraEvent()
     data class SetCamera(val camera: Camera?) : CameraEvent()
+    data class SetFocus(val x: Float, val y: Float) : CameraEvent()
 
     object SetFlashlightState : CameraEvent()
 

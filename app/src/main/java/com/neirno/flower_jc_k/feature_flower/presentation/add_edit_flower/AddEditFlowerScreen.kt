@@ -3,14 +3,14 @@ package com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,19 +21,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.neirno.flower_jc_k.R
+import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.components.ActionSelectionDialog
+import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.components.TextWithBorder
 import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
 import com.neirno.flower_jc_k.feature_flower.presentation.components.CustomTopAppBar
 import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.components.TimeSliderDialog
 import com.neirno.flower_jc_k.feature_flower.presentation.util.Screen
+import com.neirno.flower_jc_k.ui.theme.CustomDark
+import com.neirno.flower_jc_k.ui.theme.CustomWhite
+import com.neirno.flower_jc_k.ui.theme.Typography
+import kotlin.text.Typography
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditFlowerScreen(
     navController: NavController,
@@ -68,6 +80,12 @@ fun AddEditFlowerScreen(
                 modifier = Modifier,
                 onLeftButtonClick = { navController.popBackStack() },
                 leftButton = ButtonType.CLOSE,
+                rightButton = ButtonType.ACCEPT,
+                onRightButtonClick = {
+                    viewModel.onEvent(AddEditFlowerEvent.SaveFlower)
+                    navController.popBackStack()
+                    Log.i("1", "Сохранен")
+                }
             )
         },
 
@@ -97,10 +115,24 @@ fun AddEditFlowerScreen(
                 },
                 label = { Text(viewState.flowerName.hint) },
                 modifier = Modifier.fillMaxWidth(),
-                //isError = viewModel.flowerName.value.error.isNotBlank(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                //isError = viewModel.flowerDescription.value.error.isNotBlank(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                //textStyle = Typography.bodyMedium.copy(color = CustomDark),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor= CustomDark,
+                    unfocusedTextColor= CustomDark,
+                    disabledTextColor= CustomDark,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedLabelColor = CustomDark,
+                    unfocusedLabelColor = CustomDark,
+                    cursorColor = CustomDark
+                    // ... другие цвета
+                )
             )
+            Divider(Modifier.offset(0.dp, -4.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = viewState.flowerDescription.text,
@@ -110,32 +142,33 @@ fun AddEditFlowerScreen(
                 label = { Text(viewState.flowerDescription.hint) },
                 modifier = Modifier.fillMaxWidth(),
                 //isError = viewModel.flowerDescription.value.error.isNotBlank(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor= CustomDark,
+                    unfocusedTextColor= CustomDark,
+                    disabledTextColor= CustomDark,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedLabelColor = CustomDark,
+                    unfocusedLabelColor = CustomDark,
+                    cursorColor = CustomDark
+                    // ... другие цвета
+                )
             )
-
+            Divider(Modifier.offset(0.dp, -4.dp))
             Spacer(modifier = Modifier.height(16.dp))
 
-            var isDialogVisible by remember { mutableStateOf(false) }
+            // переменная для отслеживания видимости диалога
             var isTimerSliderDialogVisible by remember { mutableStateOf(false) }
-            TimeSliderDialog(
-                isVisible = isTimerSliderDialogVisible,
-                onDismiss = {isTimerSliderDialogVisible = !isTimerSliderDialogVisible},
-                timer_d = viewState.flowerTimeToWater.days,
-                timer_h = viewState.flowerTimeToWater.hours,
-                timer_m = viewState.flowerTimeToWater.minutes,
-                onValueSelected = { hours, minutes, days ->
-                    run {
-                        viewModel.onEvent(AddEditFlowerEvent.ChangeTimeToWater(days, hours, minutes))
-                    }
-                }
-            )
-
-
-
-
-            Column () {
+            // переменная для хранения текущего типа действия
+            var currentActionType by remember { mutableStateOf("") }
+            var isDialogVisible by remember { mutableStateOf(false) }
+            Column (
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 IconButton(onClick = {isDialogVisible = !isDialogVisible}) {
-                    Icon(modifier = Modifier, contentDescription = "", imageVector = Icons.Default.Add)
+                    Icon(modifier = Modifier.size(40.dp), contentDescription = ButtonType.ADD.description, painter = ButtonType.ADD.imageProvider())
                 }
 
                 ActionSelectionDialog(
@@ -147,81 +180,84 @@ fun AddEditFlowerScreen(
                     viewModel.onEvent(AddEditFlowerEvent.SelectAction(selectedAction))
                 }
 
+                fun showTimerDialogForAction(actionType: String) {
+                    currentActionType = actionType
+                    isTimerSliderDialogVisible = true
+                }
+
+                fun formatTime(days: Int, hours: Int, minutes: Int): String {
+                    val formattedHours = String.format("%02d", hours)
+                    val formattedMinutes = String.format("%02d", minutes)
+                    return "Каждые(й) $days дней(я) в $formattedHours:$formattedMinutes"
+                }
+
                 if ("WATERING" in viewState.selectedActions) {
-                    Text(
-                        text = "${viewState.flowerTimeToWater.days}:" +
-                                "${viewState.flowerTimeToWater.hours}:" +
-                                "${viewState.flowerTimeToWater.minutes}",
-                        modifier = Modifier.clickable { isTimerSliderDialogVisible = !isTimerSliderDialogVisible }
+                    TextWithBorder(
+                        text = formatTime(viewState.flowerTimeToWater.days,
+                            viewState.flowerTimeToWater.hours,
+                            viewState.flowerTimeToWater.minutes),
+                        borderColor = Color.Blue,
+                        painter = ButtonType.WATER.imageProvider(),
+                        onClick = { showTimerDialogForAction("WATERING") },
+                        onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("WATERING")) }
                     )
                 }
 
                 if ("FERTILIZING" in viewState.selectedActions) {
-                    Text(text = "ГотовоФ")
-                    // Показать информацию и поля для удобрения
+                    TextWithBorder(
+                        text = formatTime(viewState.flowerTimeToFertilize.days,
+                            viewState.flowerTimeToFertilize.hours,
+                            viewState.flowerTimeToFertilize.minutes),
+                        borderColor = Color.Green,
+                        painter = ButtonType.FERTILIZE.imageProvider(),
+                        onClick = { showTimerDialogForAction("FERTILIZING") },
+                        onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("FERTILIZING")) }
+                    )
                 }
 
                 if ("SPRAYING" in viewState.selectedActions) {
-                    Text(text = "ГотовоС")
-                    // Показать информацию и поля для опрыскивания
+                    TextWithBorder(
+                        text = formatTime(viewState.flowerTimeToSpraying.days,
+                            viewState.flowerTimeToSpraying.hours,
+                            viewState.flowerTimeToSpraying.minutes),
+                        borderColor = Color.Red,
+                        painter = ButtonType.SPRAYING.imageProvider(),
+                        onClick = { showTimerDialogForAction("SPRAYING") },
+                        onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("SPRAYING")) }
+                    )
                 }
-            }
 
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(onClick = {
-                viewModel.onEvent(AddEditFlowerEvent.SaveFlower)
-                navController.popBackStack()
-                Log.i("1", "Сохранен")
-            }) {
-                Text(text = "Add Flower")
-            }
-
-        }
-    }
-}
-
-@Composable
-fun ActionSelectionDialog(
-    showDialog: Boolean,
-    selectedActions: List<String>,
-    onCloseDialog: () -> Unit,
-    onActionSelected: (String) -> Unit
-) {
-    if (showDialog) {
-        Dialog(onDismissRequest = onCloseDialog) {
-            // Содержимое диалога
-            Column {
-                Text(text = "Выберите действие")
-
-                Spacer(modifier = Modifier.height(16.dp))
-                if ("WATERING" !in selectedActions) {
-                    Button(onClick = {
-                        onActionSelected("WATERING")
-                        onCloseDialog()
-                    }) {
-                        Text("Добавить полив")
+                TimeSliderDialog(
+                    isVisible = isTimerSliderDialogVisible,
+                    onDismiss = { isTimerSliderDialogVisible = false },
+                    // Определяем, какой именно таймер показывать, исходя из currentActionType
+                    timer_d = when (currentActionType) {
+                        "WATERING" -> viewState.flowerTimeToWater.days
+                        "FERTILIZING" -> viewState.flowerTimeToFertilize.days
+                        "SPRAYING" -> viewState.flowerTimeToSpraying.days
+                        else -> 0
+                    },
+                    timer_h = when (currentActionType) {
+                        "WATERING" -> viewState.flowerTimeToWater.hours
+                        "FERTILIZING" -> viewState.flowerTimeToFertilize.hours
+                        "SPRAYING" -> viewState.flowerTimeToSpraying.hours
+                        else -> 0
+                    },
+                    timer_m = when (currentActionType) {
+                        "WATERING" -> viewState.flowerTimeToWater.minutes
+                        "FERTILIZING" -> viewState.flowerTimeToFertilize.minutes
+                        "SPRAYING" -> viewState.flowerTimeToSpraying.minutes
+                        else -> 0
+                    },
+                    onValueSelected = { days, hours, minutes ->
+                        // Здесь отправляем событие в ViewModel, исходя из currentActionType
+                        when (currentActionType) {
+                            "WATERING" -> viewModel.onEvent(AddEditFlowerEvent.ChangeTimeToWater(days, hours, minutes))
+                            "FERTILIZING" -> viewModel.onEvent(AddEditFlowerEvent.ChangeTimeToFertilize(days, hours, minutes))
+                            "SPRAYING" -> viewModel.onEvent(AddEditFlowerEvent.ChangeTimeToSpraying(days, hours, minutes))
+                        }
                     }
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                if ("FERTILIZING" !in selectedActions) {
-                    Button(onClick = {
-                        onActionSelected("FERTILIZING")
-                        onCloseDialog()
-                    }) {
-                        Text("Добавить удобрение")
-                    }
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                if ("FERTILIZING" !in selectedActions) {
-                    Button(onClick = {
-                        onActionSelected("SPRAYING")
-                        onCloseDialog()
-                    }) {
-                        Text("Добавить опрыскивание")
-                    }
-                }
+                )
             }
         }
     }

@@ -32,7 +32,7 @@ fun CameraControls(
                 .size(72.dp))
         {
             Icon(
-                imageVector = ButtonType.ACCEPT.image,
+                painter = ButtonType.ACCEPT.imageProvider(),
                 contentDescription = ButtonType.ACCEPT.description,
                 modifier = Modifier
                     .size(72.dp),

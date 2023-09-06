@@ -10,25 +10,34 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Spa
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import com.neirno.flower_jc_k.R
 
-enum class ButtonType(val image: ImageVector, val description: String) {
-    CHAT(Icons.Default.ChatBubble, "Chat"),
-    CLOSE(Icons.Default.Close, "Close"),
-    BACK(Icons.Default.ArrowBack, "Back"),
-    SETTINGS(Icons.Default.Settings, "Settings"),
-    WATER(Icons.Default.WaterDrop, "Water"),
-    SPRAY(Icons.Default.Spa, "Spray"),
-    ADD(Icons.Default.Add, "Add"),
-    FERTILIZE(Icons.Default.Star, "Fertilize"),
-    DELETE(Icons.Default.Delete, "Delete"),
-    ACCEPT(Icons.Default.Check, "Accept"),
-    FLASH_ON(Icons.Default.FlashOn, "Flash on"),
-    FLASH_OFF(Icons.Default.FlashOff, "Flash off"),
-    NOTHING(Icons.Default.Error, "Nothing")
+enum class ButtonType(val imageProvider: @Composable () -> Painter, val description: String) {
+    CHAT({ Icons.Default.ChatBubble.asPainter() }, "Chat"),
+    CLOSE({ Icons.Default.Close.asPainter() }, "Close"),
+    BACK({ Icons.Default.ArrowBack.asPainter() }, "Back"),
+    SETTINGS({ Icons.Default.Settings.asPainter() }, "Settings"),
+    WATER({ Icons.Default.WaterDrop.asPainter() }, "Water"),
+    SPRAYING({ painterResource(id = R.drawable.spraying)}, "Spray"),
+    ADD({ Icons.Default.Add.asPainter() }, "Add"),
+    FERTILIZE({ painterResource(id = R.drawable.fertilize)} , "Fertilize"),
+    DELETE({ Icons.Default.Delete.asPainter() }, "Delete"),
+    ACCEPT({ Icons.Default.Check.asPainter() }, "Accept"),
+    FLASH_ON({ Icons.Default.FlashOn.asPainter() }, "Flash on"),
+    FLASH_OFF({ Icons.Default.FlashOff.asPainter() }, "Flash off"),
+    NOTHING({ Icons.Default.Error.asPainter() }, "Nothing"),
+    ORDER({ Icons.Default.List.asPainter() }, "Menu list"),
 }
 
+@Composable
+fun ImageVector.asPainter(): Painter {
+    return rememberVectorPainter(this)
+}

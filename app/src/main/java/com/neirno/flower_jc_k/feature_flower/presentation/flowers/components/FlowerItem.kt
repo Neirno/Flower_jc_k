@@ -1,5 +1,6 @@
 package com.neirno.flower_jc_k.feature_flower.presentation.flowers.components
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,14 +25,24 @@ import com.neirno.flower_jc_k.R
 import com.neirno.flower_jc_k.feature_flower.domain.model.Flower
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
+//@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun FlowerItem(
     flower: Flower,
@@ -46,39 +57,32 @@ fun FlowerItem(
         data = "file:///${flower.imageFilePath}",
         builder = {
             crossfade(true)
-            error(R.drawable.ic_help) // предоставьте свое изображение-заглушку
-            fallback(R.drawable.ic_home) // предоставьте свое изображение-заглушку
+            error(R.drawable.standart_flower) // предоставьте свое изображение-заглушку
+            fallback(R.drawable.standart_flower) // предоставьте свое изображение-заглушку
         }
     )
-
-    if (flower.imageFilePath != null) {
-        Log.i("ImagePath", flower.imageFilePath)
+    val daysUntilNextFertilizing = TimeUnit.MILLISECONDS.toDays(flower.nextFertilizingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
+    var daysUntilNextWatering by remember { mutableStateOf(  millisToDdHhMm(TimeUnit.MILLISECONDS.toDays(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)))}
+    Log.d("Next watering days in {${flower.name}", daysUntilNextWatering)
+    /*val scope = rememberCoroutineScope()
+    scope.launch {
+        while (true) {
+            daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0))
+            delay(1000)  // перерисовать каждую секунду
+        }
+    }*/
+    LaunchedEffect(key1 = flower) {
+        while (true) {
+            daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0))
+            delay(1000)  // перерисовать каждую секунду
+        }
     }
 
-
-/*    // Вычисляем количество дней до следующего полива
-    val daysUntilNextFertilizing = TimeUnit.MILLISECONDS.toDays(flower.nextFertilizingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
-    //val daysUntilNextSpraying = TimeUnit.MILLISECONDS.toDays(flower.nextSprayingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
-    //val daysUntilNextWatering = TimeUnit.MILLISECONDS.toDays(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)
-    val daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis())).coerceAtLeast(
-        0.toString()
-    )
-    val minutesUntilNextWatering = TimeUnit.MILLISECONDS.toMinutes(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)
-
-    val wateringProgress = if (flower.wateringDays != 0) {
-        minutesUntilNextWatering.toFloat() + 60 * 24 / (flower.wateringDays*24*60 + flower.wateringHours * 60 + flower.wateringMinutes).toFloat()
-    } else {
-        0f
-    }*/
-    val daysUntilNextFertilizing = TimeUnit.MILLISECONDS.toDays(flower.nextFertilizingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
-
-    val daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis())).coerceAtLeast(
-        0.toString()
-    )
+    //val daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0))
     // Вычисляем разницу во времени до следующего действия
     val maxTime = TimeUnit.DAYS.toMillis(flower.wateringDays.toLong())
-    val elapsedTime = (flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)
-    val wateringProgress = (maxTime - elapsedTime).toFloat() / maxTime.toFloat()
+    val elapsedTime = flower.nextWateringDateTime - System.currentTimeMillis()
+    val wateringProgress = ((maxTime - elapsedTime).toFloat() / maxTime.toFloat()).coerceAtLeast(0F)
 
     Row(
         modifier = modifier
@@ -93,9 +97,12 @@ fun FlowerItem(
         ) {
             Image(
                 painter = painter,
-                contentScale = ContentScale.Crop,
                 contentDescription = "${flower.name} image",
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp)),
+                contentScale = ContentScale.Crop,
+
             )
             if (isSelectionMode) {
                 Checkbox(

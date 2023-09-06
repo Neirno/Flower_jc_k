@@ -1,0 +1,4 @@
+<resources>
+    <string name="enter_name">Введите название…</string>
+    <string name="enter_description">Введите описание…</string>
+</resources>

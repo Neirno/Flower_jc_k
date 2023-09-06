@@ -1,5 +1,6 @@
 package com.neirno.flower_jc_k.feature_flower.presentation.camera
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -16,6 +17,11 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,10 +49,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -158,7 +167,7 @@ fun CameraScreen(
                 )
             } else {
 
-                CameraView(viewModel, cameraProviderFuture, preview, imageCapture, cameraSelector)
+                CameraView(viewModel, viewState, cameraProviderFuture, preview, imageCapture, cameraSelector)
                 CustomTopAppBar(
                     Modifier
                         .align(Alignment.TopCenter)
@@ -200,9 +209,11 @@ private fun takePhoto(context: Context, imageCapture: ImageCapture, onPhotoTaken
     )
 }
 
+@SuppressLint("ClickableViewAccessibility")
 @Composable
 private fun CameraView(
     viewModel: CameraViewModel,
+    viewState: CameraState,
     cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,
     preview: Preview,
     imageCapture: ImageCapture,
@@ -210,11 +221,22 @@ private fun CameraView(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val focusPoint = viewState.focusPoint
+    val showFocusPoint = viewState.showFocusPoint
 
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
     AndroidView(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         factory = {
             val previewView = PreviewView(context)
+            previewView.setOnTouchListener { _, event ->
+                Log.d("CameraView", "Tapped at: x = ${event.x}, y = ${event.x}")
+                viewModel.onEvent(CameraEvent.SetFocus(event.x, event.y))
+                true
+            }
             cameraProviderFuture.addListener({
                 val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
                 try {
@@ -233,7 +255,53 @@ private fun CameraView(
                 }
             }, ContextCompat.getMainExecutor(context))
             previewView
+        },
+        )
+        FocusAnimation(focusPoint, showFocusPoint)
+       /* if (showFocusPoint) {
+            Canvas(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                drawCircle(
+                    color = Color.Red,
+                    radius = 20f,
+                    center = Offset(focusPoint.first, focusPoint.second)
+                )
+            }
+        }*/
+    }
+}
+
+@Composable
+fun FocusAnimation(focusPoint: Pair<Float, Float>, showFocusPoint: Boolean) {
+    val animatedRadius = remember { Animatable(initialValue = 10f) }
+    val strokeWidth = 4f  // ширина ободка
+    LaunchedEffect(showFocusPoint) {
+        if (showFocusPoint) {
+            // Увеличение размера круга до 40f
+            animatedRadius.animateTo(
+                targetValue = 60f,
+                animationSpec = tween(200, easing = LinearOutSlowInEasing)
+            )
+            // Уменьшение размера круга до 20f
+            animatedRadius.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(200, easing = LinearOutSlowInEasing)
+            )
         }
-    )
+    }
+
+    if (showFocusPoint) {
+        Canvas(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            drawCircle(
+                color = Color.White,
+                radius = animatedRadius.value,
+                center = Offset(focusPoint.first, focusPoint.second),
+                style = Stroke(width = strokeWidth)
+            )
+        }
+    }
 }
 

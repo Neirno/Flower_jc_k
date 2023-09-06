@@ -26,12 +26,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
-import com.neirno.flower_jc_k.R
 import com.neirno.flower_jc_k.feature_flower.domain.util.FlowerOrder
 import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
+import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
+import com.neirno.flower_jc_k.ui.theme.CustomBrown
+import com.neirno.flower_jc_k.ui.theme.CustomDark
 
 
 @Composable
@@ -63,9 +64,9 @@ fun FlowerOrderDropdown(
                 }
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_help),
-                contentDescription = "Description",
-                tint = Color(0xFF079B6D)
+                painter = ButtonType.ORDER.imageProvider(),
+                contentDescription = ButtonType.ORDER.description,
+                tint = CustomDark
             )
         }
     }
@@ -143,8 +144,8 @@ fun DefaultRadioButton(
             onClick = onSelect,
             //interactionSource = interactionSource,
             colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.primary,
-                unselectedColor = MaterialTheme.colorScheme.onBackground
+                selectedColor = /*MaterialTheme.colorScheme.primary*/Color.White,
+                unselectedColor = Color.White/*MaterialTheme.colorScheme.onBackground*/
             )
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -157,16 +158,13 @@ fun DefaultRadioButton(
 fun CustomDropdownMenu(
     modifier: Modifier,
     expanded: Boolean,
-    //onDismissRequest: () -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
     if (expanded) {
         Box(
             modifier = modifier
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
-                //.border(1.dp, MaterialTheme.colorScheme.primary)
-                //.clickable { onDismissRequest() }
+                .background(CustomBrown),
         ) {
             Column(
                 content = content

@@ -9,9 +9,8 @@ import com.neirno.flower_jc_k.feature_flower.domain.model.Flower
 import java.util.concurrent.TimeUnit
 
 private fun generateRequestCode(flowerId: Long, actionType: Int): Int {
-    return (flowerId.toString() + actionType.toString()).hashCode()
+    return ("${flowerId}00${actionType}").toInt()
 }
-
 
 
 fun setAlarm(context: Context, flower: Flower, actionType: Int) {

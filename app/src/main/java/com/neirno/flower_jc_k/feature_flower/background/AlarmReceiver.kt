@@ -14,36 +14,34 @@ import androidx.core.app.NotificationManagerCompat
 import com.neirno.flower_jc_k.R
 
 class AlarmReceiver : BroadcastReceiver() {
-   /* private fun generateChannelId(actionType: Int, flowerId: Long): String {
-        return "$actionType-$flowerId"
-    }*/
-    private val channel_id: String = "flower_wfs"
+    private fun generateRequestCode(flowerId: Long, actionType: Int): Int {
+        return ("${flowerId}00${actionType}").toInt()
+    }
+
 
     override fun onReceive(context: Context, intent: Intent) {
-        println("Alarm triggered: $")
         Log.i("Work notif","Create Not")
-        val actionType = intent.getIntExtra("actionType", 0)
 
         val flowerId = intent.getLongExtra("flowerId", 0)
 
         //val channel_id = generateChannelId(actionType, flowerId)
-
-        val actionName = when(intent.getIntExtra("actionType", 0)) {
+        val actionType = intent.getIntExtra("actionType", 0)
+        val actionName = when(actionType) {
             1 -> "Время поливать цветок!"
             2 -> "Время удобрить цветок!"
             3 -> "Время опрыскать цветок!"
             else -> "Что-то пошло не так!"
         }
         val flowerName = intent.getStringExtra("flowerName")
-        createNotificationChannel(context, channel_id)
+        val notificationId = generateRequestCode(flowerId, actionType)
 
-        val notification = NotificationCompat.Builder(context, channel_id)
+        val notification = NotificationCompat.Builder(context, "simple_notification_channel")
             .setSmallIcon(R.drawable.ic_flower_list) // Replace with your own icon
             .setContentTitle("Flower Reminder")
             .setContentText("It's time to $actionName your flower (ID: $flowerName)")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setGroup("flower_reminders")
-            .setGroupSummary(true)
+            //.setGroup(flowerId.toString())
+            //.setGroupSummary(true)
             .build()
 
         val notificationManager = NotificationManagerCompat.from(context)
@@ -61,7 +59,7 @@ class AlarmReceiver : BroadcastReceiver() {
             return
         }
         // Надеюсь никогда пользователь не зайдет за intы
-        notificationManager.notify(flowerId.toInt(), notification)
+        notificationManager.notify(notificationId, notification)
         Log.i("Work notif", "All Work")
     }
 

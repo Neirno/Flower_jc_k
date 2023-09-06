@@ -8,9 +8,9 @@ data class AddEditFlowerViewState(
     val flowerImageUri: Uri? = null,
     val selectedActions: List<String> = emptyList(),
 
-    val flowerTimeToWater: Time = Time(0, 0, 0),
-    val flowerTimeToSpraying: Time = Time(0, 0, 0),
-    val flowerTimeToFertilize: Time = Time(0, 0, 0)
+    val flowerTimeToWater: Time = Time(3, 12, 0),
+    val flowerTimeToSpraying: Time = Time(1, 12, 0),
+    val flowerTimeToFertilize: Time = Time(15, 12, 0)
 )
 
 data class Time(

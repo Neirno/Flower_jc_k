@@ -55,42 +55,15 @@ import com.neirno.flower_jc_k.ui.theme.Flower_jc_kTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 
-fun createNotification(context: Context) {
+fun createNotificationChannel(context: Context) {
     val channelId = "simple_notification_channel"
     val channelName = "Simple Notification"
-    val notificationId = 1
 
     // Создание канала уведомлений для Android Oreo и выше
     val importance = NotificationManager.IMPORTANCE_DEFAULT
     val channel = NotificationChannel(channelId, channelName, importance)
     val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.createNotificationChannel(channel)
-
-    // Создание уведомления
-    val builder = NotificationCompat.Builder(context, channelId)
-        .setSmallIcon(R.drawable.ic_flower_list) // Замените на свою иконку
-        .setContentTitle("My notification")
-        .setContentText("Hello World!")
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-    // Отображение уведомления
-    with(NotificationManagerCompat.from(context)) {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            Log.i("1","ГОООООООООООООООЙДАААААААА")
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
-        notify(notificationId, builder.build())
-    }
 }
 
 @AndroidEntryPoint
@@ -114,7 +87,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             // тут запрос на все уведомления
 
-            createNotification(application.applicationContext)
+            createNotificationChannel(application.applicationContext)
             Flower_jc_kTheme {
                 val context = LocalContext.current
 

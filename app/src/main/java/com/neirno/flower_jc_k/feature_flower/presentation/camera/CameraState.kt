@@ -7,5 +7,7 @@ data class CameraState(
     val previewImageUri: Uri? = null,
     val isInPreviewMode: Boolean = false,
     val isFlashlightOn: Boolean = false,
-    val camera: Camera? = null
+    val camera: Camera? = null,
+    val focusPoint: Pair<Float, Float> = Pair(0f,0f),
+    val showFocusPoint: Boolean = false
 )
