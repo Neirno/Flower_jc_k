@@ -1,4 +1,34 @@
 <resources>
     <string name="enter_name">Введите название…</string>
     <string name="enter_description">Введите описание…</string>
+    <string name="permission_requied">Требуется разрешение</string>
+    <string name="grant_permisson">Предоставить разрешение</string>
+    <string name="camera_permission_error">Похоже, вы навсегда отказались от разрешения на камеру. Вы можете перейти в настройки приложения, чтобы предоставить его.</string>
+    <string name="camera_permission">Этому приложению нужен доступ к вашей камере, чтобы фотографировать цветы</string>
+    <string name="notification_permission_error">Похоже, вы навсегда отказались от разрешения на уведомления.Вы можете перейти в настройки приложения, чтобы предоставить его.</string>
+    <string name="notification_permission">" Этому приложению нужен доступ к уведомлениям, чтобы вы могли получать уведомления о поливе цветов."</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_confirm">Вы уверены, что хотите удалить цветок(и)?</string>
+    <string name="name">Название</string>
+    <string name="water">Полив</string>
+    <string name="fertilize">Удобрение</string>
+    <string name="spraying">Опрыскивание</string>
+    <string name="ascending">Восходящий</string>
+    <string name="descending">Убывающий</string>
+    <string name="days_before_watering">Дней до полива:</string>
+    <string name="days_before_fertilize">Дней до удобрения:</string>
+    <string name="days_before_spraying">Дней до опрыскивания:</string>
+    <string name="cancel">Отменить</string>
+    <string name="confirm">Подитвердить</string>
+    <string name="add_edit_every">Каждый(е)</string>
+    <string name="add_edit_days_in">дней(дня) в</string>
+    <string name="timer_slider_notification">Получайте уведомления через выбранное количество дней в определенное время.</string>
+    <string name="days">Дни</string>
+    <string name="hours">Часы</string>
+    <string name="minutes">Мин</string>
+    <string name="choose_action">Выберите действие</string>
+    <string name="notif_water">Пришло время поливать</string>
+    <string name="notif_fretiliz">Пришло время удобрять</string>
+    <string name="notif_spray">Пришло время опрыскивать</string>
+    <string name="error">Что-то пошло не так!</string>
 </resources>

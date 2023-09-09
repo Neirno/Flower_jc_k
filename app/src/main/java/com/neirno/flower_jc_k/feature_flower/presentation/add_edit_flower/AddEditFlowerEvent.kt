@@ -17,4 +17,5 @@ sealed class AddEditFlowerEvent {
     data class ChangeTimeToSpraying(val days: Int, val hours: Int, val minutes: Int) : AddEditFlowerEvent()
 
     object SaveFlower : AddEditFlowerEvent()
+    object DeleteImage: AddEditFlowerEvent()
 }

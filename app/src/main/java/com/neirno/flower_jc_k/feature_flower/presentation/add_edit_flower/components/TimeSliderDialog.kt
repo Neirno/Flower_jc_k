@@ -23,8 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.neirno.flower_jc_k.R
 
 @Composable
 fun TimeSliderDialog(
@@ -59,13 +61,13 @@ fun TimeSliderDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 20.dp),
-                        text = "Получайте уведомления каждые выбранные дни в заданное время.",
+                        text = stringResource(id = R.string.timer_slider_notification),
                         style = MaterialTheme.typography.labelMedium
                     )
                     Row(Modifier.fillMaxWidth()) {
                         // Часть для выбора дней
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(text = "Дни", color = Color(0xFF333733), style = MaterialTheme.typography.labelMedium)
+                            Text(text = stringResource(id = R.string.days), color = Color(0xFF333733), style = MaterialTheme.typography.labelMedium)
                             Spacer(modifier = Modifier.height(8.dp))
                             SlidingTimeSelection(
                                 modifier = Modifier.height(75.dp),
@@ -85,7 +87,7 @@ fun TimeSliderDialog(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Column {
-                                Text(text = "Часы", color = Color(0xFF203620), style = MaterialTheme.typography.labelMedium)
+                                Text(text = stringResource(id = R.string.hours), color = Color(0xFF203620), style = MaterialTheme.typography.labelMedium)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 SlidingTimeSelection(
                                     modifier = Modifier.height(75.dp),
@@ -108,7 +110,7 @@ fun TimeSliderDialog(
 
 
                             Column {
-                                Text(text = "Мин", maxLines = 1, color = Color(0xFF203620), style = MaterialTheme.typography.labelMedium)
+                                Text(text = stringResource(id = R.string.minutes), maxLines = 1, color = Color(0xFF203620), style = MaterialTheme.typography.labelMedium)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 SlidingTimeSelection(
                                     modifier = Modifier.height(75.dp),
@@ -128,13 +130,13 @@ fun TimeSliderDialog(
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { onDismiss() }) {
-                            Text("Cancel")
+                            Text(text = stringResource(id = R.string.cancel))
                         }
                         TextButton(onClick = {
                             onValueSelected(_timer_d, _timer_h, _timer_m)
                             onDismiss()
                         }) {
-                            Text("OK")
+                            Text(text = stringResource(id = R.string.ok))
                         }
                     }
                 }

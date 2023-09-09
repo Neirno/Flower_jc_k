@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -35,7 +36,11 @@ import com.neirno.flower_jc_k.feature_flower.presentation.flowers.components.Flo
 import com.neirno.flower_jc_k.feature_flower.presentation.util.Screen
 import com.neirno.flower_jc_k.feature_flower.presentation.flowers.components.BottomMenuItem
 import com.neirno.flower_jc_k.feature_flower.presentation.flowers.components.FlowerOrderDropdown
+import com.neirno.flower_jc_k.ui.theme.CustomBlue
+import com.neirno.flower_jc_k.ui.theme.CustomBrown
 import com.neirno.flower_jc_k.ui.theme.CustomDark
+import com.neirno.flower_jc_k.ui.theme.CustomGreen
+import com.neirno.flower_jc_k.ui.theme.CustomWhite
 
 @Composable
 fun FlowersScreen(
@@ -45,8 +50,8 @@ fun FlowersScreen(
     val viewState = viewModel.viewState.value
     val bottomMenuItems = listOf(
         BottomMenuItem(ButtonType.ADD, ActiveOperation.ADD, CustomDark),
-        BottomMenuItem(ButtonType.SPRAYING, ActiveOperation.SPRAY, Color.White),
-        BottomMenuItem(ButtonType.WATER, ActiveOperation.WATER, Color.Blue),
+        BottomMenuItem(ButtonType.SPRAYING, ActiveOperation.SPRAY, CustomGreen),
+        BottomMenuItem(ButtonType.WATER, ActiveOperation.WATER, CustomBlue),
         BottomMenuItem(ButtonType.FERTILIZE, ActiveOperation.FERTILIZE, Color.Yellow),
         BottomMenuItem(ButtonType.DELETE, ActiveOperation.DELETE, CustomDark),
     )
@@ -56,13 +61,13 @@ fun FlowersScreen(
         viewModel.onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
     }
     Scaffold(
-        containerColor = Color(0xFFDBD2C0),
+        containerColor = CustomWhite,
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.25f)
-                    .background(color = Color(0xFFDBD2C0)),
+                    .background(color = CustomWhite),
 
 
                 horizontalArrangement = Arrangement.Start,
@@ -72,7 +77,7 @@ fun FlowersScreen(
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(
-                        text = "FlowerHelper",
+                        text = stringResource(id = R.string.app_name),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -80,11 +85,13 @@ fun FlowersScreen(
                     FlowerOrderDropdown(
                         flowerOrder = viewState.orderState.flowerOrder,
                         onOrderChange = { order -> viewModel.onEvent(FlowersEvent.Order(order)) },
-                        modifier = Modifier.align(Alignment.BottomStart).padding(start = 8.dp)
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(start = 8.dp)
                     )
                 }
                 Image(
-                    painter = painterResource(id = R.drawable.romashka), // замените на ваш ресурс
+                    painter = painterResource(id = R.drawable.romashka),
                     contentDescription = "Logo",
                     modifier = Modifier
                         .weight(1f)
@@ -171,8 +178,8 @@ fun FlowersScreen(
 
     ConfirmationDialog(
         showDialog = viewState.showConfirmationDialog,
-        title = "Удаление",
-        description = "Вы уверены, что хотите удалить цветок(цветы)?",
+        title = stringResource(id = R.string.delete),
+        description = stringResource(id = R.string.delete_confirm),
         onHide = {
             viewModel.onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
             viewModel.onEvent(FlowersEvent.ClearSelectedFlower)

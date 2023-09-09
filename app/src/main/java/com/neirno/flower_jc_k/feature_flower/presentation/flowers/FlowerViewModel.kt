@@ -1,18 +1,18 @@
 package com.neirno.flower_jc_k.feature_flower.presentation.flowers
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.neirno.flower_jc_k.feature_flower.background.cancelAlarm
-import com.neirno.flower_jc_k.feature_flower.background.checkAlarm
-import com.neirno.flower_jc_k.feature_flower.background.setAlarm
 import com.neirno.flower_jc_k.feature_flower.domain.model.Flower
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.FlowerUseCases
 import com.neirno.flower_jc_k.feature_flower.domain.util.FlowerOrder
 import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
+import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.AddEditFlowerViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -24,7 +24,6 @@ import java.io.File
 
 @HiltViewModel
 class FlowerViewModel @Inject constructor(
-    @ApplicationContext private val context: Context, // Внедрение контекста
     private val flowerUseCases: FlowerUseCases
 ) : ViewModel() {
 
@@ -50,27 +49,22 @@ class FlowerViewModel @Inject constructor(
                 }
                 getFlowers(event.flowerOrder)
             }
-            is FlowersEvent.DeleteFlower -> {
+/*            is FlowersEvent.UpdateWater -> {
                 viewModelScope.launch {
                     for (flower in event.flowers) {
-                        flower.imageFilePath?.let { deleteImageFromInternalStorage(it) }
-                        flowerUseCases.deleteFlower(flower)
-                        //recentlyChangedFlowers.add(flower)
+                        if (checkAlarm(context, flower, WATERING))
+                            cancelAlarm(context, flower, WATERING) // 1 — это код для полива
 
-                    }
-                }
-            }
-            is FlowersEvent.UpdateWater -> {
-                viewModelScope.launch {
-                    for (flower in event.flowers) {
                         flowerUseCases.updateWateringDate(flower)
                         val newFlower = flowerUseCases.getFlower(flower.id)!!
-                        cancelAlarm(context, newFlower.id, WATERING) // 1 — это код для полива
 
-                        checkAlarm(context, newFlower, WATERING)
                         // Устанавливаем новый будильник
                         setAlarm(context, newFlower, WATERING) // 1 — это код для полива
 
+                        if (checkAlarm(context, newFlower, WATERING))
+                            Log.d("Alarm in updateWater", "Set on ${newFlower.nextWateringDateTime}")
+                        else
+                            Log.e("Alarm in updateWater", "Error set alarm in flower ${flower.name}, id ${flower.id}")
                     }
                 }
             }
@@ -87,6 +81,30 @@ class FlowerViewModel @Inject constructor(
                     for (flower in event.flowers) {
                         flowerUseCases.updateSprayingDate(flower)
                         //recentlyChangedFlowers.add(flower)
+                    }
+                }
+            }*/
+            is FlowersEvent.UpdateWater -> handleFlowerEventUpdate(WATERING, event.flowers)
+            is FlowersEvent.UpdateFertilize -> handleFlowerEventUpdate(FERTILIZING, event.flowers)
+            is FlowersEvent.UpdateSpray -> handleFlowerEventUpdate(SPRAYING, event.flowers)
+
+            is FlowersEvent.DeleteFlower -> {
+                viewModelScope.launch {
+                    for (flower in event.flowers) {
+                        flower.imageFilePath?.let { flowerUseCases.deleteImage(Uri.parse(it))}
+
+                        if (flowerUseCases.checkAlarmForFlower(flower, WATERING))
+                            flowerUseCases.cancelAlarmForFlower(flower, WATERING)
+
+                        if (flowerUseCases.checkAlarmForFlower(flower, FERTILIZING))
+                            flowerUseCases.cancelAlarmForFlower(flower, FERTILIZING)
+
+                        if (flowerUseCases.checkAlarmForFlower(flower, SPRAYING))
+                            flowerUseCases.cancelAlarmForFlower(flower, SPRAYING)
+
+                        flowerUseCases.deleteFlower(flower)
+                        //recentlyChangedFlowers.add(flower)
+
                     }
                 }
             }
@@ -148,7 +166,33 @@ class FlowerViewModel @Inject constructor(
             file.delete()
         }
     }
+    private fun handleFlowerEventUpdate(actionType: Int, flowers: List<Flower>) {
+        viewModelScope.launch {
+            for (flower in flowers) {
+                if (actionType == WATERING && flowerUseCases.checkAlarmForFlower(flower, actionType)) {
+                    flowerUseCases.cancelAlarmForFlower(flower, actionType)
+                }
 
+                when (actionType) {
+                    WATERING -> flowerUseCases.updateWateringDate(flower)
+                    FERTILIZING -> flowerUseCases.updateFertilizingDate(flower)
+                    SPRAYING -> flowerUseCases.updateSprayingDate(flower)
+                }
+
+                val newFlower = flowerUseCases.getFlower(flower.id)!!
+
+                flowerUseCases.setAlarmForFlower(newFlower, actionType)
+
+                if (actionType == WATERING) {
+                    if (flowerUseCases.checkAlarmForFlower(newFlower, actionType)) {
+                        Log.d("Alarm in updateWater", "Set on ${newFlower.nextWateringDateTime}")
+                    } else {
+                        Log.e("Alarm in updateWater", "Error set alarm in flower ${flower.name}, id ${flower.id}")
+                    }
+                }
+            }
+        }
+    }
     companion object {
         const val WATERING = 1
         const val FERTILIZING = 2

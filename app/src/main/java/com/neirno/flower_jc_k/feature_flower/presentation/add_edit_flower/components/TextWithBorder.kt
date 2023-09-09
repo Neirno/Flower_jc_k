@@ -29,6 +29,8 @@ import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
 fun TextWithBorder(
     text: String,
     borderColor: Color,
+    textColor: Color,
+    iconTint: Color,
     painter: Painter?,
     onClick: () -> Unit,
     onDeleteClick: () -> Unit
@@ -50,11 +52,15 @@ fun TextWithBorder(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 painter?.let {
-                    Icon(modifier = Modifier.size(25.dp), painter = it, contentDescription = null)
+                    Icon(
+                        modifier = Modifier.size(25.dp),
+                        painter = it, contentDescription = null,
+                        tint = iconTint
+                    )
                 }
                 Text(
                     text = text,
-                    color = borderColor,
+                    color = textColor,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
             }
@@ -62,7 +68,7 @@ fun TextWithBorder(
             IconButton(modifier = Modifier.size(25.dp), onClick = onDeleteClick) {
                 Icon(
                     painter = ButtonType.DELETE.imageProvider(),
-                    contentDescription = ButtonType.DELETE.description
+                    contentDescription = ButtonType.DELETE.description,
                 )
             }
         }

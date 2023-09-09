@@ -8,13 +8,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.neirno.flower_jc_k.feature_flower.background.checkAlarm
-import com.neirno.flower_jc_k.feature_flower.background.setAlarm
+import com.neirno.flower_jc_k.R
+import com.neirno.flower_jc_k.di.FlowerModule
 import com.neirno.flower_jc_k.feature_flower.domain.model.Flower
 import com.neirno.flower_jc_k.feature_flower.domain.model.InvalidFlowerException
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.FlowerUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -24,12 +25,18 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditFlowerViewModel @Inject constructor(
     private val flowerUseCases: FlowerUseCases,
-    @ApplicationContext private val context: Context, // Внедрение контекста
+    private val resourceProvider: FlowerModule.ResourceProvider,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _viewState = mutableStateOf(AddEditFlowerViewState())
+    private val _viewState = mutableStateOf(
+        AddEditFlowerViewState(
+            flowerName = FlowerTextFieldState(hint = resourceProvider.getString(R.string.enter_name)),
+            flowerDescription = FlowerTextFieldState(hint = resourceProvider.getString(R.string.enter_description))
+        )
+    )
     val viewState: State<AddEditFlowerViewState> = _viewState
+
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -93,6 +100,9 @@ class AddEditFlowerViewModel @Inject constructor(
 
     fun onEvent(event: AddEditFlowerEvent) {
         when(event) {
+            is AddEditFlowerEvent.DeleteImage -> {
+                _viewState.value.flowerImageUri?.let { flowerUseCases.deleteImage(it) }
+            }
             is AddEditFlowerEvent.SelectAction -> {
                 _viewState.value = _viewState.value.copy(
                     selectedActions = _viewState.value.selectedActions + event.str
@@ -169,9 +179,8 @@ class AddEditFlowerViewModel @Inject constructor(
             is AddEditFlowerEvent.SaveFlower -> {
                 viewModelScope.launch {
                     try {
-                        val imagePath = _viewState.value.flowerImageUri?.let { saveImageToInternalStorage(it) }
+                        val imagePath = _viewState.value.flowerImageUri?.let { flowerUseCases.saveImage(it) }
                         val selectedActions = _viewState.value.selectedActions
-
                         val flower = Flower(
                             id = currentFlowerId ?: 0L,
                             name = _viewState.value.flowerName.text,
@@ -192,6 +201,7 @@ class AddEditFlowerViewModel @Inject constructor(
                         )
                         val oldFlower = currentFlowerId?.let { flowerUseCases.getFlower(it) }
                         var newFlower = flowerUseCases.addFlower(flower)
+                        //flowerUseCases.setAlarmForFlower(flower, WATERING)
 
                         val actionTypeMapping = mapOf(
                             WATERING to "WATERING",
@@ -210,7 +220,10 @@ class AddEditFlowerViewModel @Inject constructor(
                                 }
                                 newFlower = flowerUseCases.getFlower(newFlower.id)!!
                                 // Устанавливаем новый будильник
-                                setAlarm(context, newFlower, actionType)
+                                flowerUseCases.setAlarmForFlower(newFlower, actionType)
+                                if (oldFlower != null)
+                                     if (flowerUseCases.checkAlarmForFlower(oldFlower, actionType))
+                                         flowerUseCases.cancelAlarmForFlower(oldFlower, actionType)
                                 Log.i("AddEdit newFlower watering", newFlower.nextWateringDateTime.toString())
                             } else {
                                 // Скопируйте старую дату следующего действия, если она не изменилась
@@ -236,7 +249,7 @@ class AddEditFlowerViewModel @Inject constructor(
         object SaveFlower: UiEvent()
     }
 
-    fun Flower.needsUpdateForAction(oldFlower: Flower?, actionType: Int): Boolean {
+    private fun Flower.needsUpdateForAction(oldFlower: Flower?, actionType: Int): Boolean {
         if (oldFlower == null) return true
         return when (actionType) {
             WATERING -> this.wateringDays != oldFlower.wateringDays ||
@@ -252,7 +265,7 @@ class AddEditFlowerViewModel @Inject constructor(
         }
     }
 
-    fun Flower.copyNextDateTimeFrom(oldFlower: Flower?, actionType: Int): Flower {
+    private fun Flower.copyNextDateTimeFrom(oldFlower: Flower?, actionType: Int): Flower {
         if (oldFlower == null) return this
         return when (actionType) {
             WATERING -> this.copy(nextWateringDateTime = oldFlower.nextWateringDateTime)
@@ -261,32 +274,6 @@ class AddEditFlowerViewModel @Inject constructor(
             else -> this
         }
     }
-
-    /**
-     * Сохраняет изображение во внутреннем хранилище приложения и возвращает путь к сохраненному файлу.
-     *
-     * @param uri URI изображения, которое нужно сохранить.
-     * @return Путь к сохраненному файлу или null в случае ошибки.
-     */
-    private fun saveImageToInternalStorage(uri: Uri): String? {
-        return try {
-            val filename = "flower_image_${System.currentTimeMillis()}.jpg"
-            val destinationFilePath = "${context.filesDir}/$filename"
-
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                context.openFileOutput(filename, Context.MODE_PRIVATE).use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-            }
-
-            destinationFilePath
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-
 
     companion object {
         const val WATERING = 1

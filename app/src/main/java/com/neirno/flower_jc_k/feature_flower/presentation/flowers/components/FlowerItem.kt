@@ -24,7 +24,10 @@ import coil.compose.rememberImagePainter
 import com.neirno.flower_jc_k.R
 import com.neirno.flower_jc_k.feature_flower.domain.model.Flower
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -35,6 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
+import com.neirno.flower_jc_k.ui.theme.CustomBlue
+import com.neirno.flower_jc_k.ui.theme.CustomDark
+import com.neirno.flower_jc_k.ui.theme.CustomGreen
+import com.neirno.flower_jc_k.ui.theme.CustomWhite
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -57,36 +66,38 @@ fun FlowerItem(
         data = "file:///${flower.imageFilePath}",
         builder = {
             crossfade(true)
-            error(R.drawable.standart_flower) // предоставьте свое изображение-заглушку
-            fallback(R.drawable.standart_flower) // предоставьте свое изображение-заглушку
+            error(R.drawable.standart_flower)
+            fallback(R.drawable.standart_flower)
         }
     )
     val daysUntilNextFertilizing = TimeUnit.MILLISECONDS.toDays(flower.nextFertilizingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
     var daysUntilNextWatering by remember { mutableStateOf(  millisToDdHhMm(TimeUnit.MILLISECONDS.toDays(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)))}
+    var daysUntilNextSpraying by remember { mutableStateOf(  millisToDdHhMm(TimeUnit.MILLISECONDS.toDays(flower.nextSprayingDateTime - System.currentTimeMillis()).coerceAtLeast(0)))}
     Log.d("Next watering days in {${flower.name}", daysUntilNextWatering)
-    /*val scope = rememberCoroutineScope()
-    scope.launch {
-        while (true) {
-            daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0))
-            delay(1000)  // перерисовать каждую секунду
-        }
-    }*/
+
     LaunchedEffect(key1 = flower) {
         while (true) {
             daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0))
-            delay(1000)  // перерисовать каждую секунду
+            daysUntilNextSpraying = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextSprayingDateTime - System.currentTimeMillis()).coerceAtLeast(0))
+            delay(10000)
         }
     }
 
-    //val daysUntilNextWatering = millisToDdHhMm(TimeUnit.MILLISECONDS.toMillis(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0))
-    // Вычисляем разницу во времени до следующего действия
-    val maxTime = TimeUnit.DAYS.toMillis(flower.wateringDays.toLong())
-    val elapsedTime = flower.nextWateringDateTime - System.currentTimeMillis()
-    val wateringProgress = ((maxTime - elapsedTime).toFloat() / maxTime.toFloat()).coerceAtLeast(0F)
+    // Вычисляем разницу во времени до следующего полива
+    val maxTimeWater = TimeUnit.DAYS.toMillis(flower.wateringDays.toLong())
+    val elapsedTimeWater = flower.nextWateringDateTime - System.currentTimeMillis()
+    val wateringProgressWater = ((maxTimeWater - elapsedTimeWater).toFloat() / maxTimeWater.toFloat()).coerceAtLeast(0F)
+
+
+    // Вычисляем разницу во времени до следующего опрыскивания
+    val maxTimeSpray = TimeUnit.DAYS.toMillis(flower.wateringDays.toLong())
+    val elapsedTimeSpray = flower.nextWateringDateTime - System.currentTimeMillis()
+    val wateringProgressSpray = ((maxTimeSpray - elapsedTimeSpray).toFloat() / maxTimeSpray.toFloat()).coerceAtLeast(0F)
 
     Row(
         modifier = modifier
             .fillMaxWidth()
+            //.height(125.dp)
             .padding(8.dp)
             .clickable { onItemSelected(flower) },
         verticalAlignment = Alignment.CenterVertically
@@ -99,8 +110,15 @@ fun FlowerItem(
                 painter = painter,
                 contentDescription = "${flower.name} image",
                 modifier = Modifier
-                    .size(50.dp)
-                    .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp)),
+                    .size(75.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 4.dp,
+                            topEnd = 4.dp,
+                            bottomStart = 4.dp,
+                            bottomEnd = 4.dp
+                        )
+                    ),
                 contentScale = ContentScale.Crop,
 
             )
@@ -108,45 +126,117 @@ fun FlowerItem(
                 Checkbox(
                     checked = isSelected,
                     onCheckedChange = { onItemSelected(flower) },
-                    modifier = Modifier.align(Alignment.TopStart) // чтобы чекбокс появлялся в верхнем левом углу изображения
+                    modifier = Modifier.align(Alignment.Center), // чтобы чекбокс появлялся в верхнем левом углу изображения
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = Color.White,   // цвет при выбранном состоянии
+                        uncheckedColor = Color.White,  // цвет при невыбранном состоянии
+                        checkmarkColor = CustomDark, // цвет галочки
+                        //backgroundColor = Color.White // цвет фона
+                    )
                 )
             }
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp)
+                .padding(start = 16.dp),
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = flower.name, style = MaterialTheme.typography.titleMedium
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
            /* LinearProgressIndicator(
                 progress = 1f - (daysUntilNextWatering.toFloat() / 7f),
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.primary
             )*/
+            if (flower.wateringDays != 0) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        tint = CustomBlue,
+                        painter = ButtonType.WATER.imageProvider(),
+                        contentDescription = ButtonType.WATER.description
+                    )
+                    Column {
+                        Text(
+                            text = "${stringResource(id = R.string.water)}: $daysUntilNextWatering",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        LinearProgressIndicator(
+                            progress = /*1f - */wateringProgressWater,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(4.dp)
+                                .border(1.dp, Color.Black)
+                                .clip(RoundedCornerShape(8.dp)), // Закругленные углы с радиусом 8.dp
+                            color = CustomDark,
+                            trackColor = CustomBlue
+                        )
+                    }
 
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "Дней до полива: $daysUntilNextWatering",
-                style = MaterialTheme.typography.labelSmall/*bodyMedium*/
-            )
-            LinearProgressIndicator(
-                progress = /*1f - */wateringProgress,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, Color.Black)
-                    .clip(RoundedCornerShape(8.dp)), // Закругленные углы с радиусом 8.dp
-                color = Color.Gray,
-                trackColor = Color.Blue
-            )
+            if (flower.sprayingDays != 0) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        tint = CustomGreen,
+                        painter = ButtonType.SPRAYING.imageProvider(),
+                        contentDescription = ButtonType.SPRAYING.description
+                    )
+                    Column {
+                        Text(
+                            text = "${stringResource(id = R.string.spraying)}: $daysUntilNextSpraying",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        LinearProgressIndicator(
+                            progress = wateringProgressSpray,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(4.dp)
+                                .border(1.dp, Color.Black)
+                                .clip(RoundedCornerShape(8.dp)), // Закругленные углы с радиусом 8.dp
+                            color = CustomDark,
+                            trackColor = CustomGreen
+                        )
+                    }
 
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Дней до удобрения: $daysUntilNextFertilizing",
-                style = MaterialTheme.typography.labelSmall
-            )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (flower.fertilizingDays != 0) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.Yellow,
+                        painter = ButtonType.FERTILIZE.imageProvider(),
+                        contentDescription = ButtonType.FERTILIZE.description
+                    )
+                    Text(
+                        //modifier = Modifier.padding(top = 4.dp),
+                        text = "${stringResource(id = R.string.fertilize)}: $daysUntilNextFertilizing дней",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                //Spacer(modifier = Modifier.height(4.dp))
+            }
         }
     }
 }

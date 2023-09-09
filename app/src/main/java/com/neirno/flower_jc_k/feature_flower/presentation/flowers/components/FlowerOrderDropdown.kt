@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
 import com.neirno.flower_jc_k.feature_flower.domain.util.FlowerOrder
@@ -33,6 +34,7 @@ import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
 import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
 import com.neirno.flower_jc_k.ui.theme.CustomBrown
 import com.neirno.flower_jc_k.ui.theme.CustomDark
+import com.neirno.flower_jc_k.R
 
 
 @Composable
@@ -78,25 +80,25 @@ fun FlowerOrderDropdown(
                 expanded = isDropdownExpanded,
             ) {
                 DefaultRadioButton(
-                    text = "Name",
+                    text = stringResource(id = R.string.name),
                     selected = flowerOrder is FlowerOrder.Name,
                     onSelect = { onOrderChange(FlowerOrder.Name(flowerOrder.orderType)) }
                 )
                 //Spacer(modifier = Modifier.width(2.dp))
                 DefaultRadioButton(
-                    text = "Water",
+                    text = stringResource(id = R.string.water),
                     selected = flowerOrder is FlowerOrder.Water,
                     onSelect = { onOrderChange(FlowerOrder.Water(flowerOrder.orderType)) }
                 )
                 //Spacer(modifier = Modifier.width(2.dp))
                 DefaultRadioButton(
-                    text = "Fertilize",
+                    text = stringResource(id = R.string.fertilize),
                     selected = flowerOrder is FlowerOrder.Fertilize,
                     onSelect = { onOrderChange(FlowerOrder.Fertilize(flowerOrder.orderType)) }
                 )
                 //Spacer(modifier = Modifier.width(2.dp))
                 DefaultRadioButton(
-                    text = "Spraying",
+                    text = stringResource(id = R.string.spraying),
                     selected = flowerOrder is FlowerOrder.Spraying,
                     onSelect = { onOrderChange(FlowerOrder.Spraying(flowerOrder.orderType)) }
                 )
@@ -104,7 +106,7 @@ fun FlowerOrderDropdown(
                 Divider(modifier = Modifier.width(45.dp))
 
                 DefaultRadioButton(
-                    text = "Ascending",
+                    text = stringResource(id = R.string.ascending),
                     selected = flowerOrder.orderType is OrderType.Ascending,
                     onSelect = {
                         onOrderChange(flowerOrder.copy(OrderType.Ascending))
@@ -112,7 +114,7 @@ fun FlowerOrderDropdown(
                 )
                 //Spacer(modifier = Modifier.width(2.dp))
                 DefaultRadioButton(
-                    text = "Descending",
+                    text = stringResource(id = R.string.descending),
                     selected = flowerOrder.orderType is OrderType.Descending,
                     onSelect = {
                         onOrderChange(flowerOrder.copy(OrderType.Descending))

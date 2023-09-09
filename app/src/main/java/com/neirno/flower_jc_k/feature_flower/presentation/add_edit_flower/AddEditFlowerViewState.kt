@@ -1,6 +1,8 @@
 package com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower
 
 import android.net.Uri
+import androidx.compose.ui.res.stringResource
+import com.neirno.flower_jc_k.R
 
 data class AddEditFlowerViewState(
     val flowerName: FlowerTextFieldState = FlowerTextFieldState(hint = "Enter name..."),

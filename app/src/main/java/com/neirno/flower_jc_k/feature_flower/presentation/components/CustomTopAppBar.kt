@@ -15,64 +15,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.neirno.flower_jc_k.ui.theme.CustomDark
 
-/*
 
-@Composable
-fun CustomTopAppBar(
-    modifier: Modifier = Modifier,
-    buttonType: ButtonType? = null,
-    onButtonClick: (() -> Unit)? = null,
-    buttonSettings: ButtonType? = null,
-    onClickSettings: (() -> Unit)? = null,
-) {
-    Row(
-        modifier = modifier.padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        buttonType?.let {
-            IconButton(
-                onClick = { onButtonClick?.invoke() }
-            ) {
-                Image(
-                    painter = painterResource(it.image),
-                    contentDescription = it.description
-                )
-            }
-        }
-
-        Text(
-            text = "Название приложения",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        )
-
-        buttonSettings?.let {
-            IconButton(
-                onClick = { onClickSettings?.invoke() },
-            ) {
-                Image(
-                    painter = painterResource(it.image),
-                    contentDescription = it.description,
-                )
-            }
-        }
-    }
-    Divider()
-}
-*/
 @Composable
 fun CustomTopAppBar(
     modifier: Modifier = Modifier,
     leftButton: ButtonType? = null,
     onLeftButtonClick: (() -> Unit)? = null,
+    tintLeft: Color? = null,
     rightButton: ButtonType? = null,
     onRightButtonClick: (() -> Unit)? = null,
+    tintRight: Color? = null,
 ) {
     Box(
         modifier = Modifier

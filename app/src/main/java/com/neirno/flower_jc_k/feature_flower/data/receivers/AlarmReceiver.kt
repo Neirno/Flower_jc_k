@@ -1,8 +1,6 @@
-package com.neirno.flower_jc_k.feature_flower.background
+package com.neirno.flower_jc_k.feature_flower.data.receivers
 
 import android.Manifest
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,33 +10,29 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.neirno.flower_jc_k.R
+import com.neirno.flower_jc_k.feature_flower.data.utils.generateRequestCode
 
 class AlarmReceiver : BroadcastReceiver() {
-    private fun generateRequestCode(flowerId: Long, actionType: Int): Int {
-        return ("${flowerId}00${actionType}").toInt()
-    }
-
-
     override fun onReceive(context: Context, intent: Intent) {
         Log.i("Work notif","Create Not")
 
         val flowerId = intent.getLongExtra("flowerId", 0)
-
+ 
         //val channel_id = generateChannelId(actionType, flowerId)
         val actionType = intent.getIntExtra("actionType", 0)
         val actionName = when(actionType) {
-            1 -> "Время поливать цветок!"
-            2 -> "Время удобрить цветок!"
-            3 -> "Время опрыскать цветок!"
-            else -> "Что-то пошло не так!"
+            1 -> context.getString(R.string.notif_water)
+            2 -> context.getString(R.string.notif_fretiliz)
+            3 -> context.getString(R.string.notif_spray)
+            else -> context.getString(R.string.error)
         }
         val flowerName = intent.getStringExtra("flowerName")
         val notificationId = generateRequestCode(flowerId, actionType)
 
-        val notification = NotificationCompat.Builder(context, "simple_notification_channel")
-            .setSmallIcon(R.drawable.ic_flower_list) // Replace with your own icon
-            .setContentTitle("Flower Reminder")
-            .setContentText("It's time to $actionName your flower (ID: $flowerName)")
+        val notification = NotificationCompat.Builder(context, "flower_helper")
+            .setSmallIcon(R.drawable.ic_notification) // Replace with your own icon
+            .setContentTitle(context.getString(R.string.app_name))
+            .setContentText("$actionName $flowerName!")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             //.setGroup(flowerId.toString())
             //.setGroupSummary(true)
@@ -62,18 +56,4 @@ class AlarmReceiver : BroadcastReceiver() {
         notificationManager.notify(notificationId, notification)
         Log.i("Work notif", "All Work")
     }
-
-    private fun createNotificationChannel(context: Context, channel_id: String) {
-        val name = "Flower Reminders"
-        val descriptionText = "Channel for flower care reminders"
-        val importance = NotificationManager.IMPORTANCE_HIGH
-        val channel = NotificationChannel(channel_id, name, importance).apply {
-            description = descriptionText
-        }
-
-        val notificationManager: NotificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
-    }
 }
-

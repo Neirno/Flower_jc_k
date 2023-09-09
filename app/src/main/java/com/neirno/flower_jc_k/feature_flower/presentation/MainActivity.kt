@@ -22,6 +22,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -30,9 +32,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.app.AlarmManagerCompat
 import androidx.core.app.NotificationCompat
@@ -51,13 +55,14 @@ import com.neirno.flower_jc_k.feature_flower.presentation.flowers.FlowersScreen
 import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.AddEditFlowerScreen
 import com.neirno.flower_jc_k.feature_flower.presentation.camera.CameraScreen
 import com.neirno.flower_jc_k.feature_flower.presentation.util.Screen
+import com.neirno.flower_jc_k.ui.theme.CustomBrown
 import com.neirno.flower_jc_k.ui.theme.Flower_jc_kTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 
 fun createNotificationChannel(context: Context) {
-    val channelId = "simple_notification_channel"
-    val channelName = "Simple Notification"
+    val channelId = "flower_helper"
+    val channelName = "Flower Helper"
 
     // Создание канала уведомлений для Android Oreo и выше
     val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -110,7 +115,10 @@ class MainActivity : ComponentActivity() {
                     .reversed()
                     .forEach { permission ->
                         PermissionDialog(
-                            modifier = Modifier.background(color = Color.White),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(color = CustomBrown)
+                                .padding(16.dp),
                             permissionTextProvider = when (permission) {
                                 Manifest.permission.POST_NOTIFICATIONS -> {
                                     NotificationPermissionTextProvider()
@@ -118,9 +126,9 @@ class MainActivity : ComponentActivity() {
                                 Manifest.permission.CAMERA -> {
                                     CameraPermissionTextProvider()
                                 }
-                                Manifest.permission.USE_EXACT_ALARM -> {
+                                /*Manifest.permission.USE_EXACT_ALARM -> {
                                     ExactAlarmPermissionTextProvider()
-                                }
+                                }*/
                                 /*Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
                                     StoragePermissionTextProvider()
                                 }*/

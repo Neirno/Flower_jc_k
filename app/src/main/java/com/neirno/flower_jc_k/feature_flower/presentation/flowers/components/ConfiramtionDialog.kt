@@ -13,8 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.neirno.flower_jc_k.R
 
 @Composable
 fun ConfirmationDialog(
@@ -47,7 +49,7 @@ fun ConfirmationDialog(
                         TextButton(
                             onClick = onHide
                         ) {
-                            Text("Отменить", style = MaterialTheme.typography.labelSmall)
+                            Text(text = stringResource(id = R.string.cancel), style = MaterialTheme.typography.labelSmall)
                         }
                         TextButton(
                             onClick = {
@@ -55,7 +57,7 @@ fun ConfirmationDialog(
                                 onHide()
                             }
                         ) {
-                            Text("Подтвердить", style = MaterialTheme.typography.labelSmall)
+                            Text(text = stringResource(id = R.string.confirm), style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }

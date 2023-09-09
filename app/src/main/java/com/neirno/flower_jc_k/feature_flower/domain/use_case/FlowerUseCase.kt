@@ -9,4 +9,9 @@ data class FlowerUseCases(
     val updateFertilizingDate: UpdateFertilizingDate,
     val updateSprayingDate: UpdateSprayingDate,
     val updateWateringDate: UpdateWateringDate,
+    val setAlarmForFlower: SetAlarmForFlower,
+    val cancelAlarmForFlower: CancelAlarmForFlower,
+    val checkAlarmForFlower: CheckAlarmForFlower,
+    val saveImage: SaveImage,
+    val deleteImage: DeleteImage
 )

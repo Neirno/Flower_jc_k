@@ -2,4 +2,35 @@
     <string name="app_name" translatable="false">Flower Helper</string>
     <string name="enter_name">Enter name…</string>
     <string name="enter_description">Enter description…</string>
+    <string name="permission_requied">Permission required</string>
+    <string name="grant_permisson">Grant permission</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="camera_permission_error">Looks like you\'ve permanently revoked camera permission. You can go to the app settings to provide it.</string>
+    <string name="camera_permission">This app needs access to your camera in order to take pictures of flowers</string>
+    <string name="notification_permission_error">It looks like you\'ve permanently denied notification permission. You can go to the app\'s settings to grant it.</string>
+    <string name="notification_permission">This app needs notification access so that you can receive notifications when watering flowers.</string>
+    <string name="delete">Delete</string>
+    <string name="delete_confirm">Are you sure you want to delete the flower(s)?</string>
+    <string name="name">Name</string>
+    <string name="water">Water</string>
+    <string name="fertilize">Fertilize</string>
+    <string name="spraying">Spraying</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="days_before_watering">Days before watering:</string>
+    <string name="days_before_fertilize">Days before fertilize:</string>
+    <string name="days_before_spraying">Days before spraying:</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="add_edit_every">Every</string>
+    <string name="add_edit_days_in">days at</string>
+    <string name="timer_slider_notification">Receive notifications after a selected number of days at a specific time.</string>
+    <string name="days">Days</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Min</string>
+    <string name="choose_action">Choose action</string>
+    <string name="notif_water">It\'s time to water</string>
+    <string name="notif_fretiliz">It\'s time to fertilize</string>
+    <string name="notif_spray">It\'s time to spray</string>
+    <string name="error">Something went wrong!</string>
 </resources>

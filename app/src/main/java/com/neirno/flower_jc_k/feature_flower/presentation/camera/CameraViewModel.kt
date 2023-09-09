@@ -10,6 +10,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.neirno.flower_jc_k.feature_flower.domain.use_case.FlowerUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +27,9 @@ import java.util.Queue
 import javax.inject.Inject
 
 @HiltViewModel
-class CameraViewModel @Inject constructor(): ViewModel() {
+class CameraViewModel @Inject constructor(
+    private val flowerUseCases: FlowerUseCases,
+): ViewModel() {
     private val _viewState = mutableStateOf(CameraState())
     val viewState: State<CameraState> = _viewState
 
@@ -44,7 +47,7 @@ class CameraViewModel @Inject constructor(): ViewModel() {
             is CameraEvent.UpdatePreviewImageUri -> {
                 viewModelScope.launch {
                     // Удаление предыдущего изображения
-                    previousImage.value?.let { deleteImage(it) }
+                    previousImage.value?.let { flowerUseCases.deleteImage(it) }
                     previousImage.value = event.uri
                     _viewState.value = _viewState.value.copy(previewImageUri = previousImage.value)
                 }
@@ -76,24 +79,6 @@ class CameraViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    /*private fun processFocusEvents(focusEvents: ReceiveChannel<Pair<Float, Float>>) {
-        viewModelScope.launch {
-            var lastFocusTime = 0L
-            val debounceTime = 400L // время в миллисекундах
-            var lastFocusPoint: Pair<Float, Float>? = null
-            for (focusPoint in focusEvents) {
-                lastFocusPoint = focusPoint
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - lastFocusTime >= debounceTime) {
-                    lastFocusTime = currentTime
-                    currentFocusJob?.cancel()
-                    currentFocusJob = launch {
-                        setFocus(lastFocusPoint.first, lastFocusPoint.second)
-                    }
-                }
-            }
-        }
-    }*/
     private fun processFocusEvents(focusEvents: ReceiveChannel<Pair<Float, Float>>) {
         viewModelScope.launch {
             var lastFocusTime = 0L
@@ -145,21 +130,6 @@ class CameraViewModel @Inject constructor(): ViewModel() {
         viewModelScope.launch {
             delay(400)  // например, через 0.4 секунды
             _viewState.value = _viewState.value.copy(showFocusPoint = false)
-        }
-    }
-
-    private fun deleteImage(uri: Uri) {
-        try {
-            val file = uri.path?.let { File(it) }
-            if (file != null) {
-                if (file.exists()) {
-                    file.delete()
-                }
-            } else {
-                Log.w("Delete Image warning (null):", uri.toString())
-            }
-        } catch (e: Exception) {
-            Log.e("Delete Image error:", e.message.toString())
         }
     }
 }

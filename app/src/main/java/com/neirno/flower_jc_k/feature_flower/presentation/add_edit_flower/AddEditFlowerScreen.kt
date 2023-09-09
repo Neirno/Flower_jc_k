@@ -23,6 +23,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -40,18 +42,19 @@ import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
 import com.neirno.flower_jc_k.feature_flower.presentation.components.CustomTopAppBar
 import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.components.TimeSliderDialog
 import com.neirno.flower_jc_k.feature_flower.presentation.util.Screen
+import com.neirno.flower_jc_k.ui.theme.CustomBlue
 import com.neirno.flower_jc_k.ui.theme.CustomDark
+import com.neirno.flower_jc_k.ui.theme.CustomGreen
 import com.neirno.flower_jc_k.ui.theme.CustomWhite
-import com.neirno.flower_jc_k.ui.theme.Typography
-import kotlin.text.Typography
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditFlowerScreen(
     navController: NavController,
     viewModel: AddEditFlowerViewModel = hiltViewModel()
 ) {
     val viewState = viewModel.viewState.value
+
+    val context = LocalContext.current
 
     val existingImagePath = viewState.flowerImageUri // Получение пути изображения из ViewModel
 
@@ -70,11 +73,12 @@ fun AddEditFlowerScreen(
     )
 
     BackHandler() {
+        viewModel.onEvent(AddEditFlowerEvent.DeleteImage)
         navController.popBackStack()
     }
 
     Scaffold(
-        containerColor = Color(0xFFDBD2C0),
+        containerColor = CustomWhite,
         topBar = {
             CustomTopAppBar(
                 modifier = Modifier,
@@ -104,9 +108,11 @@ fun AddEditFlowerScreen(
                     .size(256.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, MaterialTheme.colorScheme.primary)
+                    .border(1.dp, CustomDark)
                     .clickable { navController.navigate(Screen.CameraScreen.route) }
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = viewState.flowerName.text,
@@ -124,8 +130,8 @@ fun AddEditFlowerScreen(
                     disabledTextColor= CustomDark,
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
-                    focusedLabelColor = CustomDark,
-                    unfocusedLabelColor = CustomDark,
+                    focusedLabelColor = Color.Gray,
+                    unfocusedLabelColor = Color.Gray,
                     cursorColor = CustomDark
                     // ... другие цвета
                 )
@@ -149,8 +155,8 @@ fun AddEditFlowerScreen(
                     disabledTextColor= CustomDark,
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
-                    focusedLabelColor = CustomDark,
-                    unfocusedLabelColor = CustomDark,
+                    focusedLabelColor = Color.Gray,
+                    unfocusedLabelColor = Color.Gray,
                     cursorColor = CustomDark
                     // ... другие цвета
                 )
@@ -188,19 +194,23 @@ fun AddEditFlowerScreen(
                 fun formatTime(days: Int, hours: Int, minutes: Int): String {
                     val formattedHours = String.format("%02d", hours)
                     val formattedMinutes = String.format("%02d", minutes)
-                    return "Каждые(й) $days дней(я) в $formattedHours:$formattedMinutes"
+                    return "${context.getString(R.string.add_edit_every)}" +
+                            " $days ${context.getString(R.string.add_edit_days_in)}" +
+                            " $formattedHours:$formattedMinutes"
                 }
-
                 if ("WATERING" in viewState.selectedActions) {
                     TextWithBorder(
                         text = formatTime(viewState.flowerTimeToWater.days,
                             viewState.flowerTimeToWater.hours,
                             viewState.flowerTimeToWater.minutes),
-                        borderColor = Color.Blue,
+                        borderColor = CustomBlue,
+                        textColor = CustomDark,
+                        iconTint = CustomBlue,
                         painter = ButtonType.WATER.imageProvider(),
                         onClick = { showTimerDialogForAction("WATERING") },
                         onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("WATERING")) }
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
 
                 if ("FERTILIZING" in viewState.selectedActions) {
@@ -208,11 +218,14 @@ fun AddEditFlowerScreen(
                         text = formatTime(viewState.flowerTimeToFertilize.days,
                             viewState.flowerTimeToFertilize.hours,
                             viewState.flowerTimeToFertilize.minutes),
-                        borderColor = Color.Green,
+                        borderColor = Color.Yellow,
+                        textColor = CustomDark,
+                        iconTint = Color.Yellow,
                         painter = ButtonType.FERTILIZE.imageProvider(),
                         onClick = { showTimerDialogForAction("FERTILIZING") },
                         onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("FERTILIZING")) }
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
 
                 if ("SPRAYING" in viewState.selectedActions) {
@@ -220,11 +233,14 @@ fun AddEditFlowerScreen(
                         text = formatTime(viewState.flowerTimeToSpraying.days,
                             viewState.flowerTimeToSpraying.hours,
                             viewState.flowerTimeToSpraying.minutes),
-                        borderColor = Color.Red,
+                        borderColor = CustomGreen,
+                        textColor = CustomDark,
+                        iconTint = CustomGreen,
                         painter = ButtonType.SPRAYING.imageProvider(),
                         onClick = { showTimerDialogForAction("SPRAYING") },
                         onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("SPRAYING")) }
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
 
                 TimeSliderDialog(
