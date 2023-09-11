@@ -13,9 +13,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +48,7 @@ import com.neirno.flower_jc_k.ui.theme.CustomBlue
 import com.neirno.flower_jc_k.ui.theme.CustomDark
 import com.neirno.flower_jc_k.ui.theme.CustomGreen
 import com.neirno.flower_jc_k.ui.theme.CustomWhite
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AddEditFlowerScreen(
@@ -53,6 +56,8 @@ fun AddEditFlowerScreen(
     viewModel: AddEditFlowerViewModel = hiltViewModel()
 ) {
     val viewState = viewModel.viewState.value
+
+
 
     val context = LocalContext.current
 
@@ -77,7 +82,27 @@ fun AddEditFlowerScreen(
         navController.popBackStack()
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when(event) {
+                is  AddEditFlowerViewModel.UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+                is AddEditFlowerViewModel.UiEvent.SaveFlower -> {
+                    navController.navigateUp()
+                }
+            }
+        }
+    }
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         containerColor = CustomWhite,
         topBar = {
             CustomTopAppBar(
@@ -87,7 +112,8 @@ fun AddEditFlowerScreen(
                 rightButton = ButtonType.ACCEPT,
                 onRightButtonClick = {
                     viewModel.onEvent(AddEditFlowerEvent.SaveFlower)
-                    navController.popBackStack()
+                    /*viewModel.onEvent(AddEditFlowerEvent.SaveFlower)
+                    navController.popBackStack()*/
                     Log.i("1", "Сохранен")
                 }
             )
