@@ -31,4 +31,5 @@
     <string name="notif_fretiliz">Пришло время удобрять</string>
     <string name="notif_spray">Пришло время опрыскивать</string>
     <string name="error">Что-то пошло не так!</string>
+    <string name="error_name">Название цветка не может быть пустым.</string>
 </resources>

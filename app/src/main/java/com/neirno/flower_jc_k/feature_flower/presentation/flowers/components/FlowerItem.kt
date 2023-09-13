@@ -91,7 +91,7 @@ fun FlowerItem(
 
     // Вычисляем разницу во времени до следующего опрыскивания
     val maxTimeSpray = TimeUnit.DAYS.toMillis(flower.wateringDays.toLong())
-    val elapsedTimeSpray = flower.nextWateringDateTime - System.currentTimeMillis()
+    val elapsedTimeSpray = flower.nextSprayingDateTime - System.currentTimeMillis()
     val wateringProgressSpray = ((maxTimeSpray - elapsedTimeSpray).toFloat() / maxTimeSpray.toFloat()).coerceAtLeast(0F)
 
     Row(
@@ -146,11 +146,6 @@ fun FlowerItem(
                 text = flower.name, style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
-           /* LinearProgressIndicator(
-                progress = 1f - (daysUntilNextWatering.toFloat() / 7f),
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary
-            )*/
             if (flower.wateringDays != 0) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,

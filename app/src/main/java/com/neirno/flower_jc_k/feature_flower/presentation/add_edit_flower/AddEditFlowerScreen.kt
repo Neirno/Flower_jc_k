@@ -45,6 +45,7 @@ import com.neirno.flower_jc_k.feature_flower.presentation.components.CustomTopAp
 import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.components.TimeSliderDialog
 import com.neirno.flower_jc_k.feature_flower.presentation.util.Screen
 import com.neirno.flower_jc_k.ui.theme.CustomBlue
+import com.neirno.flower_jc_k.ui.theme.CustomBrown
 import com.neirno.flower_jc_k.ui.theme.CustomDark
 import com.neirno.flower_jc_k.ui.theme.CustomGreen
 import com.neirno.flower_jc_k.ui.theme.CustomWhite
@@ -72,8 +73,8 @@ fun AddEditFlowerScreen(
         data = existingImagePath,
         builder = {
             crossfade(true)
-            error(R.drawable.ic_help) // предоставьте свое изображение-заглушку
-            fallback(R.drawable.ic_home) // предоставьте свое изображение-заглушку
+            error(R.drawable.ic_camera) // предоставьте свое изображение-заглушку
+            fallback(R.drawable.ic_camera) // предоставьте свое изображение-заглушку
         }
     )
 
@@ -89,6 +90,7 @@ fun AddEditFlowerScreen(
             when(event) {
                 is  AddEditFlowerViewModel.UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
+                        withDismissAction = true,
                         message = event.message
                     )
                 }
@@ -101,7 +103,14 @@ fun AddEditFlowerScreen(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    modifier = Modifier.padding(16.dp),
+                    containerColor = CustomBrown,
+                    contentColor = CustomDark,
+                    snackbarData = data,
+                )
+            }
         },
         containerColor = CustomWhite,
         topBar = {

@@ -59,18 +59,6 @@ import com.neirno.flower_jc_k.ui.theme.CustomBrown
 import com.neirno.flower_jc_k.ui.theme.Flower_jc_kTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-
-fun createNotificationChannel(context: Context) {
-    val channelId = "flower_helper"
-    val channelName = "Flower Helper"
-
-    // Создание канала уведомлений для Android Oreo и выше
-    val importance = NotificationManager.IMPORTANCE_DEFAULT
-    val channel = NotificationChannel(channelId, channelName, importance)
-    val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.createNotificationChannel(channel)
-}
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -92,7 +80,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             // тут запрос на все уведомления
 
-            createNotificationChannel(application.applicationContext)
             Flower_jc_kTheme {
                 val context = LocalContext.current
 

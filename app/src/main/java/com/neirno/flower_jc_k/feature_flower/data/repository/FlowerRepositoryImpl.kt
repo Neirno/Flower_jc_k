@@ -64,7 +64,7 @@ class FlowerRepositoryImpl (
         flowerDao.update(updatedFlower)
     }
 
-    private suspend fun getNextActionTimeInMillis(days: Int, hours: Int, minutes: Int): Long {
+    private fun getNextActionTimeInMillis(days: Int, hours: Int, minutes: Int): Long {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_MONTH, days)
         calendar.set(Calendar.HOUR_OF_DAY, hours)

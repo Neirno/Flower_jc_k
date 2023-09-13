@@ -82,12 +82,13 @@ object FlowerModule {
     fun provideFlowerUseCases(
         repository: FlowerRepository,
         alarmServices: AlarmServices,
-        storageManager: ImageStorageManager
+        storageManager: ImageStorageManager,
+        resourceProvider: ResourceProvider
     ): FlowerUseCases {
         return FlowerUseCases(
             getFlowers = GetFlowers(repository),
             deleteFlower = DeleteFlower(repository),
-            addFlower = AddFlower(repository),
+            addFlower = AddFlower(repository, resourceProvider),
             getFlower = GetFlower(repository),
             updateFlower = UpdateFlower(repository),
             updateFertilizingDate = UpdateFertilizingDate(repository),

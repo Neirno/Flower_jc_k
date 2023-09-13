@@ -235,7 +235,7 @@ class AddEditFlowerViewModel @Inject constructor(
                     } catch(e: InvalidFlowerException) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackbar(
-                                message = e.message ?: "Couldn't save flower"
+                                message = e.message ?: resourceProvider.getString(R.string.error)
                             )
                         )
                     }
