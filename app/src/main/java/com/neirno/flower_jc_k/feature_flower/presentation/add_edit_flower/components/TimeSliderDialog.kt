@@ -27,6 +27,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.neirno.flower_jc_k.R
+import com.neirno.flower_jc_k.ui.theme.CustomBrown
+import com.neirno.flower_jc_k.ui.theme.CustomDark
 
 @Composable
 fun TimeSliderDialog(
@@ -44,7 +46,7 @@ fun TimeSliderDialog(
         Dialog(onDismissRequest = { onDismiss() }) {
             Box(modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFFC0DFC1))
+                .background(CustomBrown)
                 .padding(16.dp))
 
             {
@@ -130,13 +132,13 @@ fun TimeSliderDialog(
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { onDismiss() }) {
-                            Text(text = stringResource(id = R.string.cancel))
+                            Text(text = stringResource(id = R.string.cancel), color = CustomDark)
                         }
                         TextButton(onClick = {
                             onValueSelected(_timer_d, _timer_h, _timer_m)
                             onDismiss()
                         }) {
-                            Text(text = stringResource(id = R.string.ok))
+                            Text(text = stringResource(id = R.string.ok), color = CustomDark)
                         }
                     }
                 }

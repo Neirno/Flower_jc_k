@@ -49,17 +49,16 @@ import com.neirno.flower_jc_k.ui.theme.CustomBrown
 import com.neirno.flower_jc_k.ui.theme.CustomDark
 import com.neirno.flower_jc_k.ui.theme.CustomGreen
 import com.neirno.flower_jc_k.ui.theme.CustomWhite
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AddEditFlowerScreen(
     navController: NavController,
-    viewModel: AddEditFlowerViewModel = hiltViewModel()
+    viewState: AddEditFlowerViewState,
+    onEvent: (AddEditFlowerEvent) -> Unit,
+    eventsFlow: SharedFlow<AddEditFlowerViewModel.UiEvent>
 ) {
-    val viewState = viewModel.viewState.value
-
-
-
     val context = LocalContext.current
 
     val existingImagePath = viewState.flowerImageUri // Получение пути изображения из ViewModel
@@ -67,7 +66,7 @@ fun AddEditFlowerScreen(
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     val imageUri: Uri? = savedStateHandle?.get("imageUri")
     if (imageUri != null)
-        viewModel.onEvent(AddEditFlowerEvent.SetImage(imageUri))
+        onEvent(AddEditFlowerEvent.SetImage(imageUri))
 
     val painter = rememberImagePainter(
         data = existingImagePath,
@@ -79,14 +78,14 @@ fun AddEditFlowerScreen(
     )
 
     BackHandler() {
-        viewModel.onEvent(AddEditFlowerEvent.DeleteImage)
+        onEvent(AddEditFlowerEvent.DeleteImage)
         navController.popBackStack()
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
+        eventsFlow.collectLatest { event ->
             when(event) {
                 is  AddEditFlowerViewModel.UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
@@ -120,7 +119,7 @@ fun AddEditFlowerScreen(
                 leftButton = ButtonType.CLOSE,
                 rightButton = ButtonType.ACCEPT,
                 onRightButtonClick = {
-                    viewModel.onEvent(AddEditFlowerEvent.SaveFlower)
+                    onEvent(AddEditFlowerEvent.SaveFlower)
                     /*viewModel.onEvent(AddEditFlowerEvent.SaveFlower)
                     navController.popBackStack()*/
                     Log.i("1", "Сохранен")
@@ -152,7 +151,7 @@ fun AddEditFlowerScreen(
             OutlinedTextField(
                 value = viewState.flowerName.text,
                 onValueChange = { newValue ->
-                    viewModel.onEvent(AddEditFlowerEvent.EnteredName(newValue))
+                    onEvent(AddEditFlowerEvent.EnteredName(newValue))
                 },
                 label = { Text(viewState.flowerName.hint) },
                 modifier = Modifier.fillMaxWidth(),
@@ -178,7 +177,7 @@ fun AddEditFlowerScreen(
             OutlinedTextField(
                 value = viewState.flowerDescription.text,
                 onValueChange = { newValue ->
-                    viewModel.onEvent(AddEditFlowerEvent.EnteredDescription(newValue))
+                    onEvent(AddEditFlowerEvent.EnteredDescription(newValue))
                 },
                 label = { Text(viewState.flowerDescription.hint) },
                 modifier = Modifier.fillMaxWidth(),
@@ -218,7 +217,7 @@ fun AddEditFlowerScreen(
                     onCloseDialog = { isDialogVisible = false }
                 ) { selectedAction ->
                     // Здесь отправим событие в ViewModel
-                    viewModel.onEvent(AddEditFlowerEvent.SelectAction(selectedAction))
+                    onEvent(AddEditFlowerEvent.SelectAction(selectedAction))
                 }
 
                 fun showTimerDialogForAction(actionType: String) {
@@ -243,7 +242,7 @@ fun AddEditFlowerScreen(
                         iconTint = CustomBlue,
                         painter = ButtonType.WATER.imageProvider(),
                         onClick = { showTimerDialogForAction("WATERING") },
-                        onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("WATERING")) }
+                        onDeleteClick = { onEvent(AddEditFlowerEvent.RemoveAction("WATERING")) }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -258,7 +257,7 @@ fun AddEditFlowerScreen(
                         iconTint = Color.Yellow,
                         painter = ButtonType.FERTILIZE.imageProvider(),
                         onClick = { showTimerDialogForAction("FERTILIZING") },
-                        onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("FERTILIZING")) }
+                        onDeleteClick = { onEvent(AddEditFlowerEvent.RemoveAction("FERTILIZING")) }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -273,7 +272,7 @@ fun AddEditFlowerScreen(
                         iconTint = CustomGreen,
                         painter = ButtonType.SPRAYING.imageProvider(),
                         onClick = { showTimerDialogForAction("SPRAYING") },
-                        onDeleteClick = { viewModel.onEvent(AddEditFlowerEvent.RemoveAction("SPRAYING")) }
+                        onDeleteClick = { onEvent(AddEditFlowerEvent.RemoveAction("SPRAYING")) }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -303,9 +302,9 @@ fun AddEditFlowerScreen(
                     onValueSelected = { days, hours, minutes ->
                         // Здесь отправляем событие в ViewModel, исходя из currentActionType
                         when (currentActionType) {
-                            "WATERING" -> viewModel.onEvent(AddEditFlowerEvent.ChangeTimeToWater(days, hours, minutes))
-                            "FERTILIZING" -> viewModel.onEvent(AddEditFlowerEvent.ChangeTimeToFertilize(days, hours, minutes))
-                            "SPRAYING" -> viewModel.onEvent(AddEditFlowerEvent.ChangeTimeToSpraying(days, hours, minutes))
+                            "WATERING" -> onEvent(AddEditFlowerEvent.ChangeTimeToWater(days, hours, minutes))
+                            "FERTILIZING" -> onEvent(AddEditFlowerEvent.ChangeTimeToFertilize(days, hours, minutes))
+                            "SPRAYING" -> onEvent(AddEditFlowerEvent.ChangeTimeToSpraying(days, hours, minutes))
                         }
                     }
                 )

@@ -18,36 +18,20 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -59,15 +43,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.google.common.util.concurrent.ListenableFuture
-import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.AddEditFlowerEvent
-import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.AddEditFlowerViewModel
 import com.neirno.flower_jc_k.feature_flower.presentation.camera.components.CameraControls
 import com.neirno.flower_jc_k.feature_flower.presentation.camera.components.CanvasPhoto
 import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
@@ -76,8 +56,9 @@ import java.io.File
 
 @Composable
 fun CameraScreen(
-    viewModel: CameraViewModel = hiltViewModel(),
     navController: NavController,
+    viewState: CameraState,
+    onEvent: (CameraEvent) -> Unit
 ) {
     val context: Context = LocalContext.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -85,28 +66,27 @@ fun CameraScreen(
     val cameraSelector = remember { CameraSelector.DEFAULT_BACK_CAMERA }
     val imageCapture: ImageCapture = remember { ImageCapture.Builder().build() }
 
-    val viewState = viewModel.viewState.value
-
     BackHandler() {
         if (viewState.isInPreviewMode) {
-            viewModel.onEvent(CameraEvent.UpdatePreviewImageUri(null))
-            viewModel.onEvent(CameraEvent.SetIsInPreviewMode(false))
+            onEvent(CameraEvent.UpdatePreviewImageUri(null))
+            onEvent(CameraEvent.SetIsInPreviewMode(false))
         } else {
             navController.popBackStack()
         }
     }
 
-    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val uri: Uri? = result.data?.data
-            if (uri != null) {
-                viewModel.onEvent(CameraEvent.UpdatePreviewImageUri(uri))
-                viewModel.onEvent(CameraEvent.SetIsInPreviewMode(true))
+    val startForResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val uri: Uri? = result.data?.data
+                if (uri != null) {
+                    onEvent(CameraEvent.UpdatePreviewImageUri(uri))
+                    onEvent(CameraEvent.SetIsInPreviewMode(true))
+                }
             }
         }
-    }
 
-    Scaffold (
+    Scaffold(
         bottomBar = {
             Column(
                 modifier = Modifier
@@ -120,17 +100,20 @@ fun CameraScreen(
                     isInPreviewMode = viewState.isInPreviewMode,
                     onCapture = {
                         takePhoto(context, imageCapture) { uri ->
-                            viewModel.onEvent(CameraEvent.UpdatePreviewImageUri(uri))
-                            viewModel.onEvent(CameraEvent.SetIsInPreviewMode(true))
+                            onEvent(CameraEvent.UpdatePreviewImageUri(uri))
+                            onEvent(CameraEvent.SetIsInPreviewMode(true))
                         }
                     },
                     onOpenGallery = {
-                        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                        val intent =
+                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                         startForResult.launch(intent)
                     },
                     onAccept = {
                         Log.d("NavControllerDebug", "Before setting imageUri")
-                        navController.previousBackStackEntry?.savedStateHandle?.set("imageUri", viewState.previewImageUri)
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            "imageUri", viewState.previewImageUri
+                        )
                         Log.d("NavControllerDebug", "After setting imageUri")
                         navController.previousBackStackEntry?.savedStateHandle?.apply {
                             set("imageUri", viewState.previewImageUri)
@@ -161,21 +144,27 @@ fun CameraScreen(
                         .background(Color.Transparent),
                     leftButton = ButtonType.BACK,
                     onLeftButtonClick = {
-                        viewModel.onEvent(CameraEvent.UpdatePreviewImageUri(null))
-                        viewModel.onEvent(CameraEvent.SetIsInPreviewMode(false))
+                        onEvent(CameraEvent.UpdatePreviewImageUri(null))
+                        onEvent(CameraEvent.SetIsInPreviewMode(false))
                     }
                 )
             } else {
-
-                CameraView(viewModel, viewState, cameraProviderFuture, preview, imageCapture, cameraSelector)
+                CameraView(
+                    viewState = viewState,
+                    onEvent = onEvent,
+                    cameraProviderFuture = cameraProviderFuture,
+                    preview = preview,
+                    imageCapture = imageCapture,
+                    cameraSelector = cameraSelector
+                )
                 CustomTopAppBar(
                     Modifier
                         .align(Alignment.TopCenter)
                         .background(Color.Transparent),
                     leftButton = ButtonType.CLOSE,
-                    onLeftButtonClick = {navController.popBackStack()},
+                    onLeftButtonClick = { navController.popBackStack() },
                     onRightButtonClick = {
-                        viewModel.onEvent(CameraEvent.SetFlashlightState)
+                        onEvent(CameraEvent.SetFlashlightState)
                     },
                     rightButton = if (viewState.isFlashlightOn) ButtonType.FLASH_ON else ButtonType.FLASH_OFF
                 )
@@ -212,8 +201,8 @@ private fun takePhoto(context: Context, imageCapture: ImageCapture, onPhotoTaken
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 private fun CameraView(
-    viewModel: CameraViewModel,
     viewState: CameraState,
+    onEvent: (CameraEvent) -> Unit,
     cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,
     preview: Preview,
     imageCapture: ImageCapture,
@@ -227,48 +216,33 @@ private fun CameraView(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-    AndroidView(
-        modifier = Modifier
-            .fillMaxSize(),
-        factory = {
-            val previewView = PreviewView(context)
-            previewView.setOnTouchListener { _, event ->
-                Log.d("CameraView", "Tapped at: x = ${event.x}, y = ${event.x}")
-                viewModel.onEvent(CameraEvent.SetFocus(event.x, event.y))
-                true
-            }
-            cameraProviderFuture.addListener({
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-                try {
-                    // Очищаем все предыдущие использования камеры перед повторным использованием
-                    cameraProvider.unbindAll()
-                    val camera = cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        cameraSelector,
-                        preview,
-                        imageCapture
-                    )
-                    viewModel.onEvent(CameraEvent.SetCamera(camera))
-                    preview.setSurfaceProvider(previewView.surfaceProvider)
-                } catch (exc: Exception) {
-                    Log.e("CameraView", "Use case binding failed", exc)
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = {
+                val previewView = PreviewView(context)
+                previewView.setOnTouchListener { _, event ->
+                    Log.d("CameraView", "Tapped at: x = ${event.x}, y = ${event.x}")
+                    onEvent(CameraEvent.SetFocus(event.x, event.y))
+                    true
                 }
-            }, ContextCompat.getMainExecutor(context))
-            previewView
-        },
+                cameraProviderFuture.addListener({
+                    val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+                    try {
+                        // Очищаем все предыдущие использования камеры перед повторным использованием
+                        cameraProvider.unbindAll()
+                        val camera = cameraProvider.bindToLifecycle(
+                            lifecycleOwner, cameraSelector, preview, imageCapture
+                        )
+                        onEvent(CameraEvent.SetCamera(camera))
+                        preview.setSurfaceProvider(previewView.surfaceProvider)
+                    } catch (exc: Exception) {
+                        Log.e("CameraView", "Use case binding failed", exc)
+                    }
+                }, ContextCompat.getMainExecutor(context))
+                previewView
+            },
         )
         FocusAnimation(focusPoint, showFocusPoint)
-       /* if (showFocusPoint) {
-            Canvas(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                drawCircle(
-                    color = Color.Red,
-                    radius = 20f,
-                    center = Offset(focusPoint.first, focusPoint.second)
-                )
-            }
-        }*/
     }
 }
 

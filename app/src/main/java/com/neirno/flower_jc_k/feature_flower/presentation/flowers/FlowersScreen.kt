@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -26,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.neirno.flower_jc_k.R
 import com.neirno.flower_jc_k.feature_flower.presentation.components.ButtonType
@@ -45,9 +45,9 @@ import com.neirno.flower_jc_k.ui.theme.CustomWhite
 @Composable
 fun FlowersScreen(
     navController: NavController,
-    viewModel: FlowerViewModel = hiltViewModel()
+    viewState: FlowerViewState,
+    onEvent: (FlowersEvent) -> Unit
 ) {
-    val viewState = viewModel.viewState.value
     val bottomMenuItems = listOf(
         BottomMenuItem(ButtonType.ADD, ActiveOperation.ADD, CustomDark),
         BottomMenuItem(ButtonType.SPRAYING, ActiveOperation.SPRAY, CustomGreen),
@@ -57,8 +57,8 @@ fun FlowersScreen(
     )
 
     BackHandler(viewState.activeOperation != ActiveOperation.NONE) {
-        viewModel.onEvent(FlowersEvent.ClearSelectedFlower)
-        viewModel.onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
+        onEvent(FlowersEvent.ClearSelectedFlower)
+        onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
     }
     Scaffold(
         containerColor = CustomWhite,
@@ -84,7 +84,7 @@ fun FlowersScreen(
                     Spacer(modifier = Modifier.fillMaxSize())
                     FlowerOrderDropdown(
                         flowerOrder = viewState.orderState.flowerOrder,
-                        onOrderChange = { order -> viewModel.onEvent(FlowersEvent.Order(order)) },
+                        onOrderChange = { order -> onEvent(FlowersEvent.Order(order)) },
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .padding(start = 8.dp)
@@ -114,12 +114,12 @@ fun FlowersScreen(
                         ActiveOperation.SPRAY, ActiveOperation.WATER, ActiveOperation.FERTILIZE, ActiveOperation.DELETE -> {
                             when {
                                 !isActive && viewState.selectedFlowers.isNotEmpty() -> {
-                                    viewModel.onEvent(FlowersEvent.ClearSelectedFlower)
-                                    viewModel.onEvent(FlowersEvent.SetActiveOperation(menuItem.operation))
+                                    onEvent(FlowersEvent.ClearSelectedFlower)
+                                    onEvent(FlowersEvent.SetActiveOperation(menuItem.operation))
                                 }
 
                                 isActive && noFlowersSelected -> {
-                                    viewModel.onEvent(
+                                    onEvent(
                                         FlowersEvent.SetActiveOperation(
                                             ActiveOperation.NONE
                                         )
@@ -127,8 +127,8 @@ fun FlowersScreen(
                                 }
 
                                 isActive && !noFlowersSelected -> {
-                                    handleConfirmation(menuItem.operation, viewModel, viewState)
-                                    viewModel.onEvent(
+                                    handleConfirmation(menuItem.operation, onEvent, viewState)
+                                    onEvent(
                                         FlowersEvent.SetActiveOperation(
                                             ActiveOperation.NONE
                                         )
@@ -136,7 +136,7 @@ fun FlowersScreen(
                                 }
 
                                 else -> {
-                                    viewModel.onEvent(FlowersEvent.SetActiveOperation(menuItem.operation))
+                                    onEvent(FlowersEvent.SetActiveOperation(menuItem.operation))
                                 }
                             }
                         }
@@ -160,7 +160,7 @@ fun FlowersScreen(
                         flower = flowerItem,
                         onItemSelected = {
                             if (viewState.activeOperation != ActiveOperation.NONE) {
-                                viewModel.onEvent(FlowersEvent.SelectFlower(flowerItem))
+                                onEvent(FlowersEvent.SelectFlower(flowerItem))
                             } else {
                                 navController.navigate(
                                 Screen.AddEditFlowerScreen.route + "?flowerId=${flowerItem.id}"
@@ -181,39 +181,38 @@ fun FlowersScreen(
         title = stringResource(id = R.string.delete),
         description = stringResource(id = R.string.delete_confirm),
         onHide = {
-            viewModel.onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
-            viewModel.onEvent(FlowersEvent.ClearSelectedFlower)
-            viewModel.onEvent(FlowersEvent.HideConfirmationDialog)
+            onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
+            onEvent(FlowersEvent.ClearSelectedFlower)
+            onEvent(FlowersEvent.HideConfirmationDialog)
         },
         onConfirm = {
-            viewModel.onEvent(FlowersEvent.DeleteFlower(viewState.selectedFlowers))
-            viewModel.onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
-            viewModel.onEvent(FlowersEvent.ClearSelectedFlower)
-
+            onEvent(FlowersEvent.DeleteFlower(viewState.selectedFlowers))
+            onEvent(FlowersEvent.SetActiveOperation(ActiveOperation.NONE))
+            onEvent(FlowersEvent.ClearSelectedFlower)
         }
     )
 }
 
 private fun handleConfirmation(
     operation: ActiveOperation,
-    viewModel: FlowerViewModel,
-    viewState: FlowerViewState)
-{
+    onEvent: (FlowersEvent) -> Unit,
+    viewState: FlowerViewState
+) {
     when (operation) {
         ActiveOperation.FERTILIZE -> {
-            viewModel.onEvent(FlowersEvent.UpdateFertilize(viewState.selectedFlowers))
-            viewModel.onEvent(FlowersEvent.ClearSelectedFlower)
+            onEvent(FlowersEvent.UpdateFertilize(viewState.selectedFlowers))
+            onEvent(FlowersEvent.ClearSelectedFlower)
         }
 
         ActiveOperation.WATER -> {
-            viewModel.onEvent(FlowersEvent.UpdateWater(viewState.selectedFlowers))
-            viewModel.onEvent(FlowersEvent.ClearSelectedFlower)
+            onEvent(FlowersEvent.UpdateWater(viewState.selectedFlowers))
+            onEvent(FlowersEvent.ClearSelectedFlower)
         }
         ActiveOperation.SPRAY -> {
-            viewModel.onEvent(FlowersEvent.UpdateSpray(viewState.selectedFlowers))
-            viewModel.onEvent(FlowersEvent.ClearSelectedFlower)
+            onEvent(FlowersEvent.UpdateSpray(viewState.selectedFlowers))
+            onEvent(FlowersEvent.ClearSelectedFlower)
         }
-        ActiveOperation.DELETE -> viewModel.onEvent(FlowersEvent.ShowConfirmationDialog)
+        ActiveOperation.DELETE -> onEvent(FlowersEvent.ShowConfirmationDialog)
         else -> { /* default behavior */ }
     }
 }
