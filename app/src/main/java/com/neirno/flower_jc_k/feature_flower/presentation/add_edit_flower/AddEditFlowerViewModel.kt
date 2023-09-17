@@ -55,7 +55,7 @@ class AddEditFlowerViewModel @Inject constructor(
                     currentFlowerId = flower.id
 
                     val initialSelectedActions = mutableListOf<String>()
-
+                    // Для отображения UI TimeWithBorder
                     if (flower.wateringDays != 0) {
                         initialSelectedActions.add("WATERING")
                     }
@@ -76,20 +76,21 @@ class AddEditFlowerViewModel @Inject constructor(
                             isHintVisible = false
                         ),
                         flowerImageUri = Uri.parse("file:///" + (flower.imageFilePath ?: "")),
+                        // Если в цветке установлены дни - копируем все в state
                         flowerTimeToWater = if (flower.wateringDays != 0) {
                             Time(flower.wateringDays, flower.wateringHours, flower.wateringMinutes)
                         } else {
-                            _viewState.value.flowerTimeToWater // Значения по умолчанию
+                            _viewState.value.flowerTimeToWater
                         },
                         flowerTimeToSpraying = if (flower.sprayingDays != 0) {
                             Time(flower.sprayingDays, flower.sprayingHours, flower.sprayingMinutes)
                         } else {
-                            _viewState.value.flowerTimeToSpraying // Значения по умолчанию
+                            _viewState.value.flowerTimeToSpraying
                         },
                         flowerTimeToFertilize = if (flower.fertilizingDays != 0) {
                             Time(flower.fertilizingDays, flower.fertilizingHours, flower.fertilizingMinutes)
                         } else {
-                            _viewState.value.flowerTimeToFertilize // Значения по умолчанию
+                            _viewState.value.flowerTimeToFertilize
                         },
                         selectedActions = initialSelectedActions
                     )
@@ -175,7 +176,6 @@ class AddEditFlowerViewModel @Inject constructor(
                     )
                 )
             }
-            // Продолжите с другими событиями для свойств
             is AddEditFlowerEvent.SaveFlower -> {
                 viewModelScope.launch {
                     try {
@@ -201,7 +201,6 @@ class AddEditFlowerViewModel @Inject constructor(
                         )
                         val oldFlower = currentFlowerId?.let { flowerUseCases.getFlower(it) }
                         var newFlower = flowerUseCases.addFlower(flower)
-                        //flowerUseCases.setAlarmForFlower(flower, WATERING)
 
                         val actionTypeMapping = mapOf(
                             WATERING to "WATERING",

@@ -25,7 +25,7 @@ fun CustomTopAppBar(
     modifier: Modifier = Modifier,
     leftButton: ButtonType? = null,
     onLeftButtonClick: (() -> Unit)? = null,
-    tintLeft: Color? = null,
+    tintLeft: Color? = null, // Доделать
     rightButton: ButtonType? = null,
     onRightButtonClick: (() -> Unit)? = null,
     tintRight: Color? = null,
@@ -52,8 +52,6 @@ fun CustomTopAppBar(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            // Проверяем, предоставлена ли функция для управления фонариком
-            // Внутри вашего CustomTopBar
             if (rightButton != null) {
                 Icon(
                     painter = rightButton.imageProvider(),

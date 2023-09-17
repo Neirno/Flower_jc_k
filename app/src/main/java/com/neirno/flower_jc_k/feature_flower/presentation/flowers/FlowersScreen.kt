@@ -140,9 +140,7 @@ fun FlowersScreen(
                                 }
                             }
                         }
-                        // Другие операции, если нужно
-                        else -> { /* ... */
-                        }
+                        else -> { /* ... */ }
                     }
                 },
                 activeOperation = viewState.activeOperation,

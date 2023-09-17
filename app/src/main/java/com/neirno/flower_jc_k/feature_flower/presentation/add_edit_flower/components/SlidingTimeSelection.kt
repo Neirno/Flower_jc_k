@@ -111,7 +111,6 @@ fun SlidingTimeSelection(
                     val centralPosition = remember { derivedStateOf { listState.firstVisibleItemIndex + 1 } }.value
                     val isSelected = virtualIndex == centralPosition
 
-                    // Call the callback when the item is selected
                     if (isSelected) {
                         callBack(item)
                         Log.d(TAG, "SlidingTimeSelection() selected item: $item at virtualIndex: $virtualIndex")
@@ -119,7 +118,7 @@ fun SlidingTimeSelection(
 
                     Box(
                         modifier = Modifier
-                            .height(25.dp)  // Высота каждого элемента
+                            .height(25.dp)
                             .then(
                                 if (isSelected) {
                                     Modifier.border(
@@ -143,184 +142,5 @@ fun SlidingTimeSelection(
             )
         }
         Text(text = text, modifier = Modifier.padding(start = 5.dp))
-    }
-}
-
-
-/*
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun SlidingTimeSelection(
-    modifier: Modifier = Modifier,
-    text: String = "",
-    minValue: Int = 0,
-    maxValue: Int = 60,
-    defaultValue: Int? = null,
-    callBack: (value: Int) -> Unit = {}
-) {
-    val TAG = "tzmax"
-
-    val itemsList = (minValue..maxValue).toList()
-    val itemCount = itemsList.size
-
-    // Вычисляем начальный индекс так, чтобы 0 был по центру
-    //val initialIndex = (Int.MAX_VALUE / 2) - (Int.MAX_VALUE / 2) % itemCount -1
-    val initialIndex = if (defaultValue != null && itemsList.contains(defaultValue)) {
-        (Int.MAX_VALUE / 2) - (Int.MAX_VALUE / 2) % itemCount + itemsList.indexOf(defaultValue) -1
-    } else {
-        (Int.MAX_VALUE / 2) - (Int.MAX_VALUE / 2) % itemCount -1
-    }
-
-
-    val listState = rememberLazyListState(
-        initialIndex
-    )
-    val coroutineScope = rememberCoroutineScope()
-
-    val snapBehavior = rememberSnapFlingBehavior(lazyListState = listState)
-
-    DisposableEffect(Unit) {
-        coroutineScope.launch {
-            listState.scrollToItem(initialIndex)
-        }
-        onDispose { }
-    }
-
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        LazyColumn(
-            state = listState,
-            flingBehavior = snapBehavior,
-        ) {
-            items(
-                count = Int.MAX_VALUE,
-                itemContent = { virtualIndex ->
-                    val actualIndex = virtualIndex % itemCount
-                    val item = itemsList[actualIndex]
-
-                    DisposableEffect(listState) {
-                        onDispose {
-                            coroutineScope.launch {
-                                val info = listState.layoutInfo
-                                //val centralItemIndex = (info.visibleItemsInfo.size - 1) / 2
-                                val centralItemIndex = 1
-
-                                val centralItem = info.visibleItemsInfo[centralItemIndex]
-                                val selectedValue = itemsList[centralItem.index % itemCount]
-
-                                callBack(selectedValue)
-                                Log.d(TAG, "SlidingTimeSelection() returned: $item ${centralItem.index}")
-                            }
-                        }
-                    }
-
-                    val isSelected = remember { derivedStateOf { listState.firstVisibleItemIndex } }.value + (remember { derivedStateOf { listState.layoutInfo } }.value.visibleItemsInfo.size - 1) / 2 == virtualIndex
-                    Box(
-                        modifier = Modifier
-                            //.fillMaxWidth()
-                            .height(20.dp)  // Высота каждого элемента
-                            .then(
-                                if (isSelected) {
-                                    Modifier.border(
-                                        width = 1.dp,
-                                        color = Color.Gray,
-                                        shape = RoundedCornerShape(4.dp)
-                                    )
-                                } else Modifier
-                            )  // Добавляем рамку для центрального элемента
-                            .padding(horizontal = 4.dp)  // Добавляем небольшой отступ слева и справа для красоты
-                    ) {
-                        Text(
-                            text = if (item > 9) item.toString() else "0$item",
-                            textAlign = TextAlign.Center,
-                            color = if (isSelected) Color(0xFF0000000) else Color(0x660000000),
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.W300,
-                            fontSize = if (isSelected) 20.sp else 15.sp
-                        )
-                    }
-                }
-            )
-        }
-        Text(text = text, modifier = Modifier.padding(start = 5.dp))
-    }
-}
-*/
-
-
-
-
-
-// Start building your app here!
-@Composable
-fun MyApp(_context: Context) {
-
-
-    var _timer_s = remember {
-        mutableStateOf(0)
-    }
-    var _timer_m = remember {
-        mutableStateOf(3)
-    }
-    var _timer_h = remember {
-        mutableStateOf(3)
-    }
-
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-        ) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                SlidingTimeSelection(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(280.dp),
-                    text = "H",
-//                    text = "Hour",
-                    maxValue = 23,
-                    callBack = fun(it: Int) {
-                        _timer_h.value = it
-                        // Log.d("tzmax", "选中的小时: $it")
-                    }
-                )
-
-                SlidingTimeSelection(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(280.dp),
-                    text = "M",
-//                    text = "Minute",
-                    callBack = fun(it: Int) {
-                        _timer_m.value = it
-                        // Log.d("tzmax", "选中的分钟: $it")
-                    }
-                )
-
-                SlidingTimeSelection(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(280.dp),
-                    text = "S",
-//                    text = "Second",
-                    callBack = fun(it: Int) {
-                        _timer_s.value = it
-                        // Log.d("tzmax", "选中的秒钟: $it")
-                    }
-                )
-            }
-
-
     }
 }

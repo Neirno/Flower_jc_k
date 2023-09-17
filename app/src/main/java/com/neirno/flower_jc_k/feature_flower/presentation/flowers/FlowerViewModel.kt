@@ -49,41 +49,6 @@ class FlowerViewModel @Inject constructor(
                 }
                 getFlowers(event.flowerOrder)
             }
-/*            is FlowersEvent.UpdateWater -> {
-                viewModelScope.launch {
-                    for (flower in event.flowers) {
-                        if (checkAlarm(context, flower, WATERING))
-                            cancelAlarm(context, flower, WATERING) // 1 — это код для полива
-
-                        flowerUseCases.updateWateringDate(flower)
-                        val newFlower = flowerUseCases.getFlower(flower.id)!!
-
-                        // Устанавливаем новый будильник
-                        setAlarm(context, newFlower, WATERING) // 1 — это код для полива
-
-                        if (checkAlarm(context, newFlower, WATERING))
-                            Log.d("Alarm in updateWater", "Set on ${newFlower.nextWateringDateTime}")
-                        else
-                            Log.e("Alarm in updateWater", "Error set alarm in flower ${flower.name}, id ${flower.id}")
-                    }
-                }
-            }
-            is FlowersEvent.UpdateFertilize -> {
-                viewModelScope.launch {
-                    for (flower in event.flowers) {
-                        flowerUseCases.updateFertilizingDate(flower)
-                        //recentlyChangedFlowers.add(flower)
-                    }
-                }
-            }
-            is FlowersEvent.UpdateSpray -> {
-                viewModelScope.launch {
-                    for (flower in event.flowers) {
-                        flowerUseCases.updateSprayingDate(flower)
-                        //recentlyChangedFlowers.add(flower)
-                    }
-                }
-            }*/
             is FlowersEvent.UpdateWater -> handleFlowerEventUpdate(WATERING, event.flowers)
             is FlowersEvent.UpdateFertilize -> handleFlowerEventUpdate(FERTILIZING, event.flowers)
             is FlowersEvent.UpdateSpray -> handleFlowerEventUpdate(SPRAYING, event.flowers)
@@ -160,12 +125,6 @@ class FlowerViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun deleteImageFromInternalStorage(imagePath: String) {
-        val file = File(imagePath)
-        if (file.exists()) {
-            file.delete()
-        }
-    }
     private fun handleFlowerEventUpdate(actionType: Int, flowers: List<Flower>) {
         viewModelScope.launch {
             for (flower in flowers) {

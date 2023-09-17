@@ -51,7 +51,6 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
-//@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun FlowerItem(
     flower: Flower,
@@ -73,7 +72,6 @@ fun FlowerItem(
     val daysUntilNextFertilizing = TimeUnit.MILLISECONDS.toDays(flower.nextFertilizingDateTime - System.currentTimeMillis()).coerceAtLeast(0)
     var daysUntilNextWatering by remember { mutableStateOf(  millisToDdHhMm(TimeUnit.MILLISECONDS.toDays(flower.nextWateringDateTime - System.currentTimeMillis()).coerceAtLeast(0)))}
     var daysUntilNextSpraying by remember { mutableStateOf(  millisToDdHhMm(TimeUnit.MILLISECONDS.toDays(flower.nextSprayingDateTime - System.currentTimeMillis()).coerceAtLeast(0)))}
-    Log.d("Next watering days in {${flower.name}", daysUntilNextWatering)
 
     LaunchedEffect(key1 = flower) {
         while (true) {
@@ -97,7 +95,6 @@ fun FlowerItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            //.height(125.dp)
             .padding(8.dp)
             .clickable { onItemSelected(flower) },
         verticalAlignment = Alignment.CenterVertically
@@ -126,12 +123,11 @@ fun FlowerItem(
                 Checkbox(
                     checked = isSelected,
                     onCheckedChange = { onItemSelected(flower) },
-                    modifier = Modifier.align(Alignment.Center), // чтобы чекбокс появлялся в верхнем левом углу изображения
+                    modifier = Modifier.align(Alignment.Center),
                     colors = CheckboxDefaults.colors(
                         checkedColor = Color.White,   // цвет при выбранном состоянии
                         uncheckedColor = Color.White,  // цвет при невыбранном состоянии
                         checkmarkColor = CustomDark, // цвет галочки
-                        //backgroundColor = Color.White // цвет фона
                     )
                 )
             }
@@ -169,7 +165,7 @@ fun FlowerItem(
                                 .fillMaxWidth()
                                 .height(4.dp)
                                 .border(1.dp, Color.Black)
-                                .clip(RoundedCornerShape(8.dp)), // Закругленные углы с радиусом 8.dp
+                                .clip(RoundedCornerShape(8.dp)),
                             color = CustomDark,
                             trackColor = CustomBlue
                         )
@@ -202,7 +198,7 @@ fun FlowerItem(
                                 .fillMaxWidth()
                                 .height(4.dp)
                                 .border(1.dp, Color.Black)
-                                .clip(RoundedCornerShape(8.dp)), // Закругленные углы с радиусом 8.dp
+                                .clip(RoundedCornerShape(8.dp)),
                             color = CustomDark,
                             trackColor = CustomGreen
                         )
@@ -225,12 +221,10 @@ fun FlowerItem(
                         contentDescription = ButtonType.FERTILIZE.description
                     )
                     Text(
-                        //modifier = Modifier.padding(top = 4.dp),
                         text = "${stringResource(id = R.string.fertilize)}: $daysUntilNextFertilizing дней",
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
-                //Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }

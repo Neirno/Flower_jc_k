@@ -94,14 +94,9 @@ private fun ActionButton(
         TextButton(
             onClick = onClick,
             modifier = Modifier
-                .fillMaxWidth()  // Если нужно, чтобы кнопка заполняла всю доступную ширину
-                .height(50.dp)  // Высота кнопки
+                .fillMaxWidth()
+                .height(50.dp)
                 .background(Color.Transparent)
-                /* .border(
-                    width = 1.dp,
-                    color = Color.Gray,
-                    shape = RoundedCornerShape(0.dp)
-                )*/
                 .padding(0.dp) // Убрать внутренние отступы
         ) {
             Row(

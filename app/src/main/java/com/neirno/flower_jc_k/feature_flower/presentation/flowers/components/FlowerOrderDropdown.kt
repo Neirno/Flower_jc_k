@@ -48,15 +48,13 @@ fun FlowerOrderDropdown(
 
 
     Column(
-        modifier = modifier/*.padding(start = 10.dp)*/,
+        modifier = modifier,
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Bottom
     ) {
-        // Ваш Row и все что в нем находится здесь
-
         IconButton(
             onClick = { isDropdownExpanded = true },
-            modifier = Modifier/*.border(1.dp, MaterialTheme.colorScheme.primary)*/
+            modifier = Modifier
                 .onGloballyPositioned { layoutCoordinates ->
                     val position = layoutCoordinates.localToWindow(Offset.Zero)
                     buttonCoordinates = IntOffset(
@@ -74,7 +72,7 @@ fun FlowerOrderDropdown(
     }
 
     if (isDropdownExpanded) {
-        Popup(onDismissRequest = { isDropdownExpanded = false }, offset = /*IntOffset(96, 72)*/buttonCoordinates) {
+        Popup(onDismissRequest = { isDropdownExpanded = false }, offset = buttonCoordinates) {
             CustomDropdownMenu(
                 modifier = Modifier,
                 expanded = isDropdownExpanded,
@@ -121,7 +119,6 @@ fun FlowerOrderDropdown(
                     }
                 )
             }
-            // ... Другие элементы
         }
     }
 }
@@ -144,10 +141,9 @@ fun DefaultRadioButton(
         RadioButton(
             selected = selected,
             onClick = onSelect,
-            //interactionSource = interactionSource,
             colors = RadioButtonDefaults.colors(
-                selectedColor = /*MaterialTheme.colorScheme.primary*/Color.White,
-                unselectedColor = Color.White/*MaterialTheme.colorScheme.onBackground*/
+                selectedColor = Color.White,
+                unselectedColor = Color.White
             )
         )
         Spacer(modifier = Modifier.width(8.dp))

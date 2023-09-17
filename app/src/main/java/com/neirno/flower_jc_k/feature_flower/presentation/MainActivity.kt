@@ -55,7 +55,6 @@ class MainActivity : ComponentActivity() {
         )
     } else {
         TODO("VERSION.SDK_INT < TIRAMISU")
-            //Log.i("ггГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГГ","")
     }
 
 
@@ -69,7 +68,6 @@ class MainActivity : ComponentActivity() {
     }
     @Composable
     fun AppContent() {
-        val context = LocalContext.current
         val viewModel: MainViewModel = viewModel()
         val dialogQueue = viewModel.visiblePermissionDialogQueue
         val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
@@ -84,7 +82,6 @@ class MainActivity : ComponentActivity() {
             }
         )
 
-        // Запрос разрешений (можно вынести еще дальше если требуется)
         HandlePermissions(dialogQueue, viewModel, multiplePermissionResultLauncher)
 
         Surface(color = CustomWhite) {
@@ -180,9 +177,6 @@ class MainActivity : ComponentActivity() {
 
     }
 }
-
-
-
 
 fun Activity.openAppSettings() {
     Intent(

@@ -37,7 +37,7 @@ class AlarmServicesImpl(
             pendingIntent
         )
         if (pendingIntent != null) {
-            Log.i("Alarm!!!@@", "Alarm is set to2: $nextAlarmDateTime")
+            Log.i("Alarm", "Alarm is set to: $nextAlarmDateTime")
         } else {
             Log.i("Alarm", "No alarm is set.")
         }

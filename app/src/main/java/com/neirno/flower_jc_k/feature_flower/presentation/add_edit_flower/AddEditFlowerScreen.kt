@@ -63,6 +63,7 @@ fun AddEditFlowerScreen(
 
     val existingImagePath = viewState.flowerImageUri // Получение пути изображения из ViewModel
 
+    // Переделать на viewmodel. Получени img из Camera
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     val imageUri: Uri? = savedStateHandle?.get("imageUri")
     if (imageUri != null)
@@ -120,9 +121,7 @@ fun AddEditFlowerScreen(
                 rightButton = ButtonType.ACCEPT,
                 onRightButtonClick = {
                     onEvent(AddEditFlowerEvent.SaveFlower)
-                    /*viewModel.onEvent(AddEditFlowerEvent.SaveFlower)
-                    navController.popBackStack()*/
-                    Log.i("1", "Сохранен")
+                    Log.i("AddEditFlower:", "Flower save")
                 }
             )
         },
@@ -137,7 +136,7 @@ fun AddEditFlowerScreen(
             Image(
                 painter = painter,
                 contentDescription = "Flower Image",
-                contentScale = ContentScale.Crop, // Вот этот параметр обеспечивает обрезку и масштабирование
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(256.dp)
                     .align(Alignment.CenterHorizontally)
@@ -167,7 +166,6 @@ fun AddEditFlowerScreen(
                     focusedLabelColor = Color.Gray,
                     unfocusedLabelColor = Color.Gray,
                     cursorColor = CustomDark
-                    // ... другие цвета
                 )
             )
             Divider(Modifier.offset(0.dp, -4.dp))
@@ -192,17 +190,19 @@ fun AddEditFlowerScreen(
                     focusedLabelColor = Color.Gray,
                     unfocusedLabelColor = Color.Gray,
                     cursorColor = CustomDark
-                    // ... другие цвета
                 )
             )
             Divider(Modifier.offset(0.dp, -4.dp))
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Добавить все это в state + viewmodel
 
             // переменная для отслеживания видимости диалога
             var isTimerSliderDialogVisible by remember { mutableStateOf(false) }
             // переменная для хранения текущего типа действия
             var currentActionType by remember { mutableStateOf("") }
             var isDialogVisible by remember { mutableStateOf(false) }
+
             Column (
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -216,7 +216,6 @@ fun AddEditFlowerScreen(
                     selectedActions = viewState.selectedActions,
                     onCloseDialog = { isDialogVisible = false }
                 ) { selectedAction ->
-                    // Здесь отправим событие в ViewModel
                     onEvent(AddEditFlowerEvent.SelectAction(selectedAction))
                 }
 

@@ -92,7 +92,7 @@ fun CameraScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.2f)
-                    .background(Color.White), // фоновый цвет для лучшей видимости кнопок
+                    .background(Color.White),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -247,7 +247,7 @@ private fun CameraView(
 }
 
 @Composable
-fun FocusAnimation(focusPoint: Pair<Float, Float>, showFocusPoint: Boolean) {
+private fun FocusAnimation(focusPoint: Pair<Float, Float>, showFocusPoint: Boolean) {
     val animatedRadius = remember { Animatable(initialValue = 10f) }
     val strokeWidth = 4f  // ширина ободка
     LaunchedEffect(showFocusPoint) {
