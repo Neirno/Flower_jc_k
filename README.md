@@ -2,9 +2,11 @@
 
 FlowerHelper поможет вам заботиться о ваших растениях, напоминая о необходимости полива, удобрения и опрыскивания. Фотографируйте свои растения и следите за их ростом!
 
-<img src="/screenshots/main.jpg" alt="Main Screen" width="300"/>
-<img src="/screenshots/add.jpg" alt="AddEdit Screen" width="300"/>
-<img src="/screenshots/camera.jpg" alt="Camera Screen" width="300"/>
+<p float="left">
+  <img src="/screenshots/main.jpg" alt="Main Screen" width="300" hspace="10"/>
+  <img src="/screenshots/add.jpg" alt="AddEdit Screen" width="300" hspace="10"/>
+  <img src="/screenshots/camera.jpg" alt="Camera Screen" width="300" hspace="10"/>
+</p>
 
 ## ✨ Основные функции:
 - **Добавление и удаление растений**: Управляйте вашей коллекцией растений легко и удобно.
