@@ -9,8 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +64,8 @@ fun AddEditFlowerScreen(
     val context = LocalContext.current
 
     val existingImagePath = viewState.flowerImageUri // Получение пути изображения из ViewModel
+
+    val scrollState = rememberScrollState()
 
     // Переделать на viewmodel. Получени img из Camera
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
@@ -130,7 +134,8 @@ fun AddEditFlowerScreen(
         Column (
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
         ){
             Image(
