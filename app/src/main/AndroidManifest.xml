@@ -32,6 +32,7 @@
 
         <activity
             android:name=".feature_flower.presentation.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:theme="@style/Theme.Flower_jc_k">
             <intent-filter>
