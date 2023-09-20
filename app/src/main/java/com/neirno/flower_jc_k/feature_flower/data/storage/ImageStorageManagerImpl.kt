@@ -54,18 +54,30 @@ class ImageStorageManagerImpl (
         }
     }
 
+    // трабл, не могу понять почему сохраняются Img в приватной части внешнего хранилища,а не внутри
+    // туду разобраться поч так
     override fun cleanupUnusedImages(usedImagePaths: Set<String>) {
-        // 1. Получение списка всех файлов в директории с изображениями
-        val imagesDirectory = File(context.filesDir.toURI())
+        cleanupDirectory(context.filesDir, usedImagePaths)  // Внутреннее хранилище
+        context.getExternalFilesDir(null)?.let {
+            cleanupDirectory(it, usedImagePaths)  // Внешнее хранилище
+        }
+    }
 
-        val allFiles = imagesDirectory.listFiles()?.toList() ?: emptyList()
+    private fun cleanupDirectory(directory: File, usedImagePaths: Set<String>) {
+        val allFiles = directory.listFiles()?.toList() ?: emptyList()
+        Log.i("DirectoryPath", directory.absolutePath)
+        Log.i("cleanupUnusedImages", allFiles.size.toString())
 
-        // 3. Сравнение и удаление
         for (file in allFiles) {
-            Log.i("cleanupUnusedImages", file.path)
-            if (file.path !in usedImagePaths) {
-                file.delete()
+            // Если файл не используется, удаляем его
+            if (!usedImagePaths.contains(file.absolutePath)) {
+                try {
+                    file.delete()
+                } catch (e: Exception) {
+                    Log.e("FileDeletionError", "Error deleting file: ${file.absolutePath}", e)
+                }
             }
         }
     }
+
 }

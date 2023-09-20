@@ -114,13 +114,6 @@ fun CameraScreen(
                         navController.previousBackStackEntry?.savedStateHandle?.set(
                             "imageUri", viewState.previewImageUri
                         )
-                        Log.d("NavControllerDebug", "After setting imageUri")
-                        navController.previousBackStackEntry?.savedStateHandle?.apply {
-                            set("imageUri", viewState.previewImageUri)
-                            val checkValue = get<Uri>("imageUri")
-                            Log.d("NavControllerDebug", "Value of imageUri: $checkValue")
-                        }
-
                         navController.popBackStack()
                     }
                 )
