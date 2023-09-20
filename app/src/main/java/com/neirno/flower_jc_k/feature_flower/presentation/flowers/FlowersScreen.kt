@@ -153,7 +153,6 @@ fun FlowersScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 items(viewState.orderState.flowers) { flowerItem ->
-                    Log.i(flowerItem.name, flowerItem.nextWateringDateTime.toString())
                     FlowerItem(
                         flower = flowerItem,
                         onItemSelected = {

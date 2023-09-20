@@ -43,7 +43,6 @@ fun BottomMenu(
         ) {
             items.forEach { item ->
                 val isItemActive = item.operation == activeOperation
-                println(activeOperation)
                 val animatedPadding by animateDpAsState(
                     targetValue = if (isItemActive) 0.dp else 10.dp,
                     animationSpec = spring(stiffness = Spring.StiffnessLow),

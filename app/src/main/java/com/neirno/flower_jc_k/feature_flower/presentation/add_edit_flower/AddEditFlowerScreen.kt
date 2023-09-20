@@ -83,7 +83,7 @@ fun AddEditFlowerScreen(
     )
 
     BackHandler() {
-        onEvent(AddEditFlowerEvent.DeleteImage)
+        //onEvent(AddEditFlowerEvent.DeleteImage)
         navController.popBackStack()
     }
 
@@ -130,7 +130,7 @@ fun AddEditFlowerScreen(
             )
         },
 
-    ) { contentPadding ->
+        ) { contentPadding ->
         Column (
             modifier = Modifier
                 .padding(contentPadding)

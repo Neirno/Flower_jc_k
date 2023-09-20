@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neirno.flower_jc_k.R
 import com.neirno.flower_jc_k.di.FlowerModule
+import com.neirno.flower_jc_k.feature_flower.data.storage.ImageStorageManager
 import com.neirno.flower_jc_k.feature_flower.domain.model.Flower
 import com.neirno.flower_jc_k.feature_flower.domain.model.InvalidFlowerException
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.FlowerUseCases
@@ -26,6 +27,7 @@ import javax.inject.Inject
 class AddEditFlowerViewModel @Inject constructor(
     private val flowerUseCases: FlowerUseCases,
     private val resourceProvider: FlowerModule.ResourceProvider,
+    private val imageStorage: ImageStorageManager,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -146,7 +148,7 @@ class AddEditFlowerViewModel @Inject constructor(
             }
             is AddEditFlowerEvent.SetImage -> {
                 _viewState.value = _viewState.value.copy(
-                    flowerImageUri = event.uri
+                    flowerImageUri = event.uri,
                 )
             }
             is AddEditFlowerEvent.ChangeTimeToWater -> {

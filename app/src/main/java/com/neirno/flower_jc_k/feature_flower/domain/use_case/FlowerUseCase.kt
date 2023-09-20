@@ -13,5 +13,6 @@ data class FlowerUseCases(
     val cancelAlarmForFlower: CancelAlarmForFlower,
     val checkAlarmForFlower: CheckAlarmForFlower,
     val saveImage: SaveImage,
-    val deleteImage: DeleteImage
+    val deleteImage: DeleteImage,
+    val cleanupUnusedImages: CleanupUnusedImages
 )

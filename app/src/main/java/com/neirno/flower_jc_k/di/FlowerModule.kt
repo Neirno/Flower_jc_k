@@ -14,6 +14,7 @@ import com.neirno.flower_jc_k.feature_flower.domain.services.AlarmServices
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.AddFlower
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.CancelAlarmForFlower
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.CheckAlarmForFlower
+import com.neirno.flower_jc_k.feature_flower.domain.use_case.CleanupUnusedImages
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.DeleteFlower
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.DeleteImage
 import com.neirno.flower_jc_k.feature_flower.domain.use_case.FlowerUseCases
@@ -48,11 +49,6 @@ object FlowerModule {
     }
 
 
-    @Provides
-    @Singleton
-    fun provideImageStorageManager(
-        @ApplicationContext context: Context
-    ): ImageStorageManager = ImageStorageManagerImpl(context)
 
 
     @Singleton
@@ -98,7 +94,16 @@ object FlowerModule {
             cancelAlarmForFlower = CancelAlarmForFlower(alarmServices),
             checkAlarmForFlower = CheckAlarmForFlower(alarmServices),
             saveImage = SaveImage(storageManager),
-            deleteImage = DeleteImage(storageManager)
+            deleteImage = DeleteImage(storageManager),
+            cleanupUnusedImages = CleanupUnusedImages(storageManager)
         )
     }
+
+    @Provides
+    @Singleton
+    fun provideImageStorageManager(
+        @ApplicationContext context: Context,
+    ): ImageStorageManager = ImageStorageManagerImpl(context)
+
+
 }

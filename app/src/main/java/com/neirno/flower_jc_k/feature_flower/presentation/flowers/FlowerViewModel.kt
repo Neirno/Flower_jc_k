@@ -15,13 +15,19 @@ import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
 import com.neirno.flower_jc_k.feature_flower.presentation.add_edit_flower.AddEditFlowerViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.toSet
 import java.io.File
 
+@OptIn(DelicateCoroutinesApi::class)
 @HiltViewModel
 class FlowerViewModel @Inject constructor(
     private val flowerUseCases: FlowerUseCases
@@ -36,7 +42,16 @@ class FlowerViewModel @Inject constructor(
     private var getFlowersJob: Job? = null
 
     init {
+        val flowersFlow = flowerUseCases.getFlowers(FlowerOrder.Water(OrderType.Descending))
+
+        GlobalScope.launch {
+            flowersFlow.collect { flowers ->
+                val usedImagesPaths = flowers.mapNotNull { it.imageFilePath }.mapNotNull { Uri.parse(it).path }.toSet()
+                flowerUseCases.cleanupUnusedImages(usedImagesPaths)
+            }
+        }
         getFlowers(FlowerOrder.Water(OrderType.Descending))
+
     }
 
     fun onEvent(event: FlowersEvent) {
@@ -152,6 +167,8 @@ class FlowerViewModel @Inject constructor(
             }
         }
     }
+
+
     companion object {
         const val WATERING = 1
         const val FERTILIZING = 2

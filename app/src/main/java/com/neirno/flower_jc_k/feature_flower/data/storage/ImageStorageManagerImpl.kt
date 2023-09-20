@@ -3,10 +3,22 @@ package com.neirno.flower_jc_k.feature_flower.data.storage
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.viewModelScope
+import com.neirno.flower_jc_k.feature_flower.domain.use_case.FlowerUseCases
+import com.neirno.flower_jc_k.feature_flower.domain.use_case.GetFlowers
+import com.neirno.flower_jc_k.feature_flower.domain.util.FlowerOrder
+import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.toSet
+import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
 
-class ImageStorageManagerImpl(
-    private val context: Context
+class ImageStorageManagerImpl (
+    private val context: Context,
 ) : ImageStorageManager {
     override fun saveImageToInternalStorage(uri: Uri): String? {
         return try {
@@ -42,4 +54,18 @@ class ImageStorageManagerImpl(
         }
     }
 
+    override fun cleanupUnusedImages(usedImagePaths: Set<String>) {
+        // 1. Получение списка всех файлов в директории с изображениями
+        val imagesDirectory = File(context.filesDir.toURI())
+
+        val allFiles = imagesDirectory.listFiles()?.toList() ?: emptyList()
+
+        // 3. Сравнение и удаление
+        for (file in allFiles) {
+            Log.i("cleanupUnusedImages", file.path)
+            if (file.path !in usedImagePaths) {
+                file.delete()
+            }
+        }
+    }
 }

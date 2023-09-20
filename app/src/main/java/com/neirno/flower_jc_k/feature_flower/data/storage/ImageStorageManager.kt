@@ -5,4 +5,6 @@ import android.net.Uri
 interface ImageStorageManager {
     fun saveImageToInternalStorage(uri: Uri): String?
     fun deleteImageFromInternalStorage(uri: Uri): Boolean
+
+    fun cleanupUnusedImages(usedImagePaths: Set<String>)
 }

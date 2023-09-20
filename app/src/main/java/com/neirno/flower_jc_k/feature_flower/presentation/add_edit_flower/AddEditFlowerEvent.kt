@@ -18,4 +18,5 @@ sealed class AddEditFlowerEvent {
 
     object SaveFlower : AddEditFlowerEvent()
     object DeleteImage: AddEditFlowerEvent()
+
 }

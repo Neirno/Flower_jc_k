@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -29,6 +30,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.neirno.flower_jc_k.feature_flower.domain.util.FlowerOrder
+import com.neirno.flower_jc_k.feature_flower.domain.util.OrderType
 //import com.neirno.flower_jc_k.AddFlowerPage
 //import com.neirno.flower_jc_k.MainPage
 import com.neirno.flower_jc_k.feature_flower.presentation.flowers.FlowersScreen
@@ -42,6 +45,8 @@ import com.neirno.flower_jc_k.ui.theme.CustomBrown
 import com.neirno.flower_jc_k.ui.theme.CustomWhite
 import com.neirno.flower_jc_k.ui.theme.Flower_jc_kTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
