@@ -1,6 +1,7 @@
 package com.neirno.flower_jc_k.feature_flower.presentation
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -17,10 +18,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -45,35 +49,40 @@ import com.neirno.flower_jc_k.ui.theme.CustomBrown
 import com.neirno.flower_jc_k.ui.theme.CustomWhite
 import com.neirno.flower_jc_k.ui.theme.Flower_jc_kTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val permissionsToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    val permissionsToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(
             Manifest.permission.POST_NOTIFICATIONS,
             Manifest.permission.CAMERA,
-            Manifest.permission.MANAGE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
         )
     } else {
-        TODO("VERSION.SDK_INT < TIRAMISU")
+        arrayOf(
+            Manifest.permission.CAMERA
+        )
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             Flower_jc_kTheme {
                 AppContent()
             }
         }
     }
+    @OptIn(DelicateCoroutinesApi::class)
+    @SuppressLint("CoroutineCreationDuringComposition")
     @Composable
     fun AppContent() {
-        val viewModel: MainViewModel = viewModel()
+        val viewModel = viewModel<MainViewModel>()
         val dialogQueue = viewModel.visiblePermissionDialogQueue
         val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -86,8 +95,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         )
-
         HandlePermissions(dialogQueue, viewModel, multiplePermissionResultLauncher)
+
+        LaunchedEffect(Unit) {
+            multiplePermissionResultLauncher.launch(permissionsToRequest)
+        }
 
         Surface(color = CustomWhite) {
             Navigation(navController = rememberNavController())
@@ -158,12 +170,6 @@ class MainActivity : ComponentActivity() {
                         Manifest.permission.CAMERA -> {
                             CameraPermissionTextProvider()
                         }
-                        /*Manifest.permission.USE_EXACT_ALARM -> {
-                            ExactAlarmPermissionTextProvider()
-                        }*/
-                        /*Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
-                            StoragePermissionTextProvider()
-                        }*/
                         else -> return@forEach
                     },
                     isPermanentlyDeclined = !shouldShowRequestPermissionRationale(

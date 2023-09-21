@@ -45,11 +45,9 @@ class ImageStorageManagerImpl (
                 file.delete()
                 true
             } else {
-                Log.w("Delete Image warning:", "File does not exist: ${uri.toString()}")
                 false
             }
         } catch (e: Exception) {
-            Log.e("Delete Image error:", e.message.toString())
             false
         }
     }
@@ -65,8 +63,6 @@ class ImageStorageManagerImpl (
 
     private fun cleanupDirectory(directory: File, usedImagePaths: Set<String>) {
         val allFiles = directory.listFiles()?.toList() ?: emptyList()
-        Log.i("DirectoryPath", directory.absolutePath)
-        Log.i("cleanupUnusedImages", allFiles.size.toString())
 
         for (file in allFiles) {
             // Если файл не используется, удаляем его

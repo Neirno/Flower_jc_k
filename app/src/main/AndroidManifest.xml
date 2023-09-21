@@ -13,8 +13,6 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".FlowerApplication"
@@ -26,7 +24,7 @@
         android:roundIcon="@drawable/ic_main"
         android:supportsRtl="true"
         android:theme="@style/Theme.Flower_jc_k"
-        tools:targetApi="31">
+        tools:targetApi="33">
 
         <receiver android:name=".feature_flower.data.receivers.AlarmReceiver" />
 
